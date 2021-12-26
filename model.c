@@ -57,6 +57,13 @@ int model_init(Model* mod, const char* filename) {
 			normal += 3;
 		}
 	}
+
+	free(v_arr);
+	free(s_arr);
+	for (size_t i = 0;i < mod->m;i++) {
+		free(i_arr[i]);
+	}
+	free(i_arr);
 	return 0;
 
 fail:
