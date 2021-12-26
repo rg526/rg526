@@ -1,5 +1,8 @@
 all: rg526
 
+run: rg526
+	./rg526
+
 bin/gameplay.o: gameplay.c
 	gcc gameplay.c -c -o bin/gameplay.o -Wall -Ies
 
