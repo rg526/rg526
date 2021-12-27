@@ -64,6 +64,7 @@ int model_init(Model* mod, const char* filename) {
 		free(i_arr[i]);
 	}
 	free(i_arr);
+	fclose(f);
 	return 0;
 
 fail:
@@ -77,6 +78,7 @@ fail:
 	}
 	if (vertex != NULL) free(vertex);
 	if (normal != NULL) free(normal);
+	fclose(f);
 	return -1;
 }
 

@@ -53,12 +53,14 @@ typedef struct {
 int gameplay_init(ESContext *esContext, State* state) {
 	state->data = malloc(sizeof(gameplay_data));
 	if (state->data == NULL) {
+		fprintf(stderr, "gameplay data malloc failed\n");
 		return -1;
 	}
 	gameplay_data *data = state->data;
 
 	data->prog = esLoadProgram(vertex_shader, frag_shader);
 	if (data->prog == 0) {
+		fprintf(stderr, "gameplay shader load failed\n");
 		return -1;
 	}
 
@@ -71,9 +73,16 @@ int gameplay_init(ESContext *esContext, State* state) {
 	int ret1 = model_init(&data->block, "block.dat");
 	int ret2 = model_init(&data->railway, "railway.dat");
 	if (ret1 != 0 || ret2 != 0) {
+		fprintf(stderr, "gameplay model init failed\n");
 		return -1;
 	}
 	return 0;
+}
+
+StateChg gameplay_update(ESContext *esContext, State* state) {
+	StateChg change;
+	change.ret = STATE_CONT;
+	return change;
 }
 
 void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, GLuint prog) {
@@ -145,6 +154,11 @@ void gameplay_draw(ESContext *esContext, State* state) {
 	GLuint p_loc = glGetUniformLocation(data->prog, "p_mat");
 	glUniformMatrix4fv(p_loc, 1, GL_TRUE, mat_ptr(&p_mat));
 
+	GLuint l_pos = glGetUniformLocation(data->prog, "l_pos");
+	glUniform4f(l_pos, 0.0, -30.0, 0.0, 0.0);
+	GLuint l_color = glGetUniformLocation(data->prog, "l_color");
+	glUniform4f(l_color, 1.0, 1.0, 1.0, 1.0);
+
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
 
 	Mat front_mat;
@@ -182,7 +196,7 @@ void gameplay_destroy(ESContext *esContext, State* state) {
 State gameplay_state = {
 	.init = gameplay_init,
 	.destroy = gameplay_destroy,
-	.update = NULL,
+	.update = gameplay_update,
 	.draw = gameplay_draw,
 	.data = NULL
 };
