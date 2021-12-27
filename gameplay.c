@@ -42,7 +42,7 @@ int Init (ESContext *esContext) {
 		"uniform vec4 l_color;"
 		"out vec4 o_fragColor;"
 		"void main() {"
-		"    float diff = 0.8 * max(dot(normalize(v_normal), normalize(l_pos - v_pos)), 0.0);"
+		"    float diff = 0.6 * max(dot(normalize(v_normal), normalize(l_pos - v_pos)), 0.0);"
 		"    vec4 diffuse_color = diff * l_color;"
 		"    float ambient = 0.1;"
 		"    vec4 ambient_color = ambient * l_color;"
@@ -79,7 +79,7 @@ void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, GLuint prog
 	glUniformMatrix4fv(p_loc, 1, GL_TRUE, mat_ptr(p_mat));
 
 	GLuint l_pos = glGetUniformLocation(prog, "l_pos");
-	glUniform4f(l_pos, 0.0, 20.0, 0.0, 0.0);
+	glUniform4f(l_pos, 0.0, 10.0, 0.0, 0.0);
 	GLuint l_color = glGetUniformLocation(prog, "l_color");
 	glUniform4f(l_color, 1.0, 1.0, 1.0, 1.0);
 

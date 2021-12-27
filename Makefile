@@ -3,6 +3,9 @@ all: rg526
 run: rg526
 	./rg526
 
+bin/main.o: main.c
+	gcc main.c -c -o bin/main.o -Wall -Ies
+
 bin/gameplay.o: gameplay.c
 	gcc gameplay.c -c -o bin/gameplay.o -Wall -Ies
 
@@ -24,8 +27,8 @@ bin/esUtil.o: es/esUtil.c
 bin/esUtil_X11.o: es/esUtil_X11.c
 	gcc es/esUtil_X11.c -c -o bin/esUtil_X11.o
 
-rg526: bin/gameplay.o bin/mat.o bin/vec.o bin/model.o bin/esShader.o bin/esUtil.o bin/esUtil_X11.o
-	gcc bin/gameplay.o bin/mat.o bin/vec.o bin/model.o bin/esShader.o bin/esUtil.o bin/esUtil_X11.o -lGLESv2 -lEGL -lX11 -lm -o rg526
+rg526: bin/main.o bin/gameplay.o bin/mat.o bin/vec.o bin/model.o bin/esShader.o bin/esUtil.o bin/esUtil_X11.o
+	gcc bin/main.o bin/gameplay.o bin/mat.o bin/vec.o bin/model.o bin/esShader.o bin/esUtil.o bin/esUtil_X11.o -lGLESv2 -lEGL -lX11 -lm -o rg526
 
 clean:
 	rm -f bin/*.o rg526

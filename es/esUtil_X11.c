@@ -49,7 +49,7 @@ static Atom s_wmDeleteMessage;
 //
 //      This function initialized the native X11 display and window for EGL
 //
-EGLBoolean WinCreate(ESContext *esContext, const char *title)
+GLboolean esWinCreate(ESContext *esContext, const char *title)
 {
     Window root;
     XSetWindowAttributes swa;
@@ -122,7 +122,7 @@ EGLBoolean WinCreate(ESContext *esContext, const char *title)
 //      Reads from X11 event loop and interrupt program if there is a keypress, or
 //      window close action.
 //
-GLboolean userInterrupt(ESContext *esContext)
+GLboolean esUserInterrupt(ESContext *esContext)
 {
     XEvent xev;
     KeySym key;
@@ -152,62 +152,3 @@ GLboolean userInterrupt(ESContext *esContext)
     return userinterrupt;
 }
 
-///
-//  WinLoop()
-//
-//      Start main windows loop
-//
-void WinLoop ( ESContext *esContext )
-{
-    struct timeval t1, t2;
-    struct timezone tz;
-    float deltatime;
-
-    gettimeofday ( &t1 , &tz );
-
-    while(userInterrupt(esContext) == GL_FALSE)
-    {
-        gettimeofday(&t2, &tz);
-        deltatime = (float)(t2.tv_sec - t1.tv_sec + (t2.tv_usec - t1.tv_usec) * 1e-6);
-        t1 = t2;
-
-        if (esContext->updateFunc != NULL)
-            esContext->updateFunc(esContext, deltatime);
-        if (esContext->drawFunc != NULL)
-            esContext->drawFunc(esContext);
-
-        eglSwapBuffers(esContext->eglDisplay, esContext->eglSurface);        
-    }
-}
-
-///
-//  Global extern.  The application must declsare this function
-//  that runs the application.
-//
-extern int esMain( ESContext *esContext );
-
-///
-//  main()
-//
-//      Main entrypoint for application
-//
-int main ( int argc, char *argv[] )
-{
-   ESContext esContext;
-   
-   memset ( &esContext, 0, sizeof( esContext ) );
-
-
-   if ( esMain ( &esContext ) != GL_TRUE )
-      return 1;   
- 
-   WinLoop ( &esContext );
-
-   if ( esContext.shutdownFunc != NULL )
-	   esContext.shutdownFunc ( &esContext );
-
-   if ( esContext.userData != NULL )
-	   free ( esContext.userData );
-
-   return 0;
-}

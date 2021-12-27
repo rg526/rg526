@@ -189,6 +189,11 @@ void ESUTIL_API esRegisterKeyFunc ( ESContext *esContext,
 //
 void ESUTIL_API esLogMessage ( const char *formatStr, ... );
 
+
+//esWinCreate and esUserInterrupt
+GLboolean esWinCreate(ESContext *esContext, const char *title);
+GLboolean esUserInterrupt(ESContext *esContext);
+
 //
 ///
 /// \brief Load a shader, check for compile errors, print error messages to output log

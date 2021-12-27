@@ -44,7 +44,6 @@
 #include <stdarg.h>
 #include <string.h>
 #include "esUtil.h"
-#include "esUtil_win.h"
 
 #ifdef ANDROID
 #include <android/log.h>
@@ -162,7 +161,7 @@ GLboolean ESUTIL_API esCreateWindow ( ESContext *esContext, const char *title, G
    esContext->height = height;
 #endif
 
-   if ( !WinCreate ( esContext, title ) )
+   if ( !esWinCreate ( esContext, title ) )
    {
       return GL_FALSE;
    }
