@@ -17,12 +17,17 @@ int Init (ESContext *esContext) {
 	const char vShaderStr[] =
 		"#version 300 es\n"
 		"layout(location = 0) in vec4 a_position;"
-		"layout(location = 1) in vec4 a_color;"
+		"layout(location = 1) in vec4 a_normal;"
+		"layout(location = 2) in vec4 a_color;"
 		"uniform mat4 mv_mat;"
 		"uniform mat4 p_mat;"
 		"out vec4 v_color;"
+		"out vec4 v_pos;"
+		"out vec4 v_normal;"
 		"void main() {"
 		"    v_color = a_color;"
+		"    v_pos = mv_mat * a_position;"
+		"    v_normal = -mv_mat * a_normal;"
 		"    gl_Position = p_mat * mv_mat * a_position;"
 		"}";
 
@@ -30,10 +35,21 @@ int Init (ESContext *esContext) {
 	const char fShaderStr[] =
 		"#version 300 es\n"
 		"precision mediump float;"
-		"out vec4 o_fragColor;"
 		"in vec4 v_color;"
+		"in vec4 v_pos;"
+		"in vec4 v_normal;"
+		"uniform vec4 l_pos;"
+		"uniform vec4 l_color;"
+		"out vec4 o_fragColor;"
 		"void main() {"
-		"    o_fragColor = v_color;"
+		"    float diff = 0.8 * max(dot(normalize(v_normal), normalize(l_pos - v_pos)), 0.0);"
+		"    vec4 diffuse_color = diff * l_color;"
+		"    float ambient = 0.1;"
+		"    vec4 ambient_color = ambient * l_color;"
+		"    vec4 h_vec = normalize(-v_pos + l_pos - v_pos);"
+		"    float spec = 0.5 * pow(max(dot(normalize(v_normal), h_vec), 0.0), 64.0);"
+		"    vec4 specular_color = spec * l_color;"
+		"    o_fragColor = v_color * (diffuse_color + ambient_color + specular_color);"
 		"}";
 
 	userData->programObject = esLoadProgram(vShaderStr, fShaderStr);
@@ -62,10 +78,19 @@ void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, GLuint prog
 	GLuint p_loc = glGetUniformLocation(prog, "p_mat");
 	glUniformMatrix4fv(p_loc, 1, GL_TRUE, mat_ptr(p_mat));
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), model->vertex );
-	glEnableVertexAttribArray ( 0 );
-	glVertexAttrib3fv ( 1, vec_ptr(&model->color) );
-	glDisableVertexAttribArray ( 1 );
+	GLuint l_pos = glGetUniformLocation(prog, "l_pos");
+	glUniform4f(l_pos, 0.0, 20.0, 0.0, 0.0);
+	GLuint l_color = glGetUniformLocation(prog, "l_color");
+	glUniform4f(l_color, 1.0, 1.0, 1.0, 1.0);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), model->vertex);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), model->normal);
+	glEnableVertexAttribArray(1);
+	glVertexAttrib3fv(2, vec_ptr(&model->color));
+	glDisableVertexAttribArray(2);
+
+	glEnable(GL_CULL_FACE);
 	glDrawArrays(GL_TRIANGLES, 0, model->length);
 }
 
@@ -103,10 +128,12 @@ void Draw (ESContext *esContext) {
 
 	glUseProgram(userData->programObject);
 
-	glVertexAttribPointer ( 0, 3, GL_FLOAT, GL_FALSE, 0, vertexPos );
-	glEnableVertexAttribArray ( 0 );
-	glVertexAttrib4fv ( 1, color );
-	glDisableVertexAttribArray ( 1 );
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vertexPos);
+	glEnableVertexAttribArray(0);
+	glVertexAttrib3f(1, 0.0, 0.0, 1.0);
+	glDisableVertexAttribArray(1);
+	glVertexAttrib4fv(2, color);
+	glDisableVertexAttribArray(2);
 
 	GLuint mv_loc = glGetUniformLocation(userData->programObject, "mv_mat");
 	glUniformMatrix4fv(mv_loc, 1, GL_TRUE, mat_ptr(&mv_mat));
