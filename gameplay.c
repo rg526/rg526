@@ -3,14 +3,10 @@
 #include <stdio.h>
 #include <math.h>
 #include "mat.h"
+#include "gameplay.h"
 #include "model.h"
 
-typedef struct {
-	GLuint programObject;
-	Model block, railway;
-} UserData;
-
-int Init (ESContext *esContext) {
+int gameplay_init(ESContext *esContext) {
 	UserData *userData = esContext->userData;
 	const char vShaderStr[] =
 		"#version 300 es\n"
@@ -40,19 +36,19 @@ int Init (ESContext *esContext) {
 		"uniform vec4 l_color;"
 		"out vec4 o_fragColor;"
 		"void main() {"
-		"    float diff = 0.6 * max(dot(normalize(v_normal), normalize(l_pos - v_pos)), 0.0);"
+		"    float diff = 0.5 * max(dot(normalize(v_normal), normalize(l_pos - v_pos)), 0.0);"
 		"    vec4 diffuse_color = diff * l_color;"
 		"    float ambient = 0.1;"
 		"    vec4 ambient_color = ambient * l_color;"
 		"    vec4 h_vec = normalize(-v_pos + l_pos - v_pos);"
-		"    float spec = 0.5 * pow(max(dot(normalize(v_normal), h_vec), 0.0), 64.0);"
+		"    float spec = 0.6 * pow(max(dot(normalize(v_normal), h_vec), 0.0), 64.0);"
 		"    vec4 specular_color = spec * l_color;"
 		"    o_fragColor = v_color * (diffuse_color + ambient_color + specular_color);"
 		"}";
 
 	userData->programObject = esLoadProgram(vShaderStr, fShaderStr);
 	if (userData->programObject == 0) {
-		return GL_FALSE;
+		return -1;
 	}
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -62,9 +58,9 @@ int Init (ESContext *esContext) {
 	int ret1 = model_init(&userData->block, "block.dat");
 	int ret2 = model_init(&userData->railway, "railway.dat");
 	if (ret1 != 0 || ret2 != 0) {
-		return GL_FALSE;
+		return -1;
 	}
-	return GL_TRUE;
+	return 0;
 }
 
 void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, GLuint prog) {
@@ -77,7 +73,7 @@ void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, GLuint prog
 	glUniformMatrix4fv(p_loc, 1, GL_TRUE, mat_ptr(p_mat));
 
 	GLuint l_pos = glGetUniformLocation(prog, "l_pos");
-	glUniform4f(l_pos, 0.0, 10.0, 0.0, 0.0);
+	glUniform4f(l_pos, 0.0, -30.0, 0.0, 0.0);
 	GLuint l_color = glGetUniformLocation(prog, "l_color");
 	glUniform4f(l_color, 1.0, 1.0, 1.0, 1.0);
 
@@ -92,7 +88,7 @@ void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, GLuint prog
 	glDrawArrays(GL_TRIANGLES, 0, model->length);
 }
 
-void Draw (ESContext *esContext) {
+void gameplay_draw(ESContext *esContext) {
 	UserData *userData = esContext->userData;
 
 	GLfloat color[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
@@ -164,23 +160,10 @@ void Draw (ESContext *esContext) {
 	draw_obj(&userData->block, &mv_mat, &p_mat, &front_mat, userData->programObject);
 }
 
-void Shutdown (ESContext *esContext) {
+void gameplay_destroy(ESContext *esContext) {
 	UserData *userData = esContext->userData;
 
 	glDeleteProgram(userData->programObject);
 	model_destroy(&userData->block);
 }
 
-int esMain (ESContext *esContext) {
-	esContext->userData = malloc(sizeof(UserData));
-	esCreateWindow(esContext, "Title", 1600, 900, ES_WINDOW_RGB);
-
-	if (!Init(esContext)) {
-		return GL_FALSE;
-	}
-
-	esRegisterShutdownFunc(esContext, Shutdown);
-	esRegisterDrawFunc(esContext, Draw);
-
-	return GL_TRUE;
-}
