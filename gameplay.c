@@ -8,12 +8,10 @@
 typedef struct {
 	GLuint programObject;
 	Model block, railway;
-	float aspect;
 } UserData;
 
 int Init (ESContext *esContext) {
 	UserData *userData = esContext->userData;
-	userData->aspect = 9.0 / 16.0;
 	const char vShaderStr[] =
 		"#version 300 es\n"
 		"layout(location = 0) in vec4 a_position;"
@@ -111,7 +109,8 @@ void Draw (ESContext *esContext) {
 	mat_swapyz(&swp);
 	mat_translate(&trl, 0.0, -80.0, 36.0);
 	mat_rotate(&rot, -45, 0, 0);
-	mat_projection(&persp, -14.0, 14.0, -14.0 * userData->aspect, 14.0 * userData->aspect, 20.0, 180.0);
+	float aspect = (float)(esContext->height) / (float)(esContext->width);
+	mat_projection(&persp, -14.0, 14.0, -14.0 * aspect, 14.0 * aspect, 20.0, 180.0);
 
 	Mat mv_mat, p_mat, mvp;
 
