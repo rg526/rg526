@@ -6,57 +6,70 @@
 #include "gameplay.h"
 #include "model.h"
 
-int gameplay_init(ESContext *esContext) {
-	UserData *userData = esContext->userData;
-	const char vShaderStr[] =
-		"#version 300 es\n"
-		"layout(location = 0) in vec4 a_position;"
-		"layout(location = 1) in vec4 a_normal;"
-		"layout(location = 2) in vec4 a_color;"
-		"uniform mat4 mv_mat;"
-		"uniform mat4 p_mat;"
-		"out vec4 v_color;"
-		"out vec4 v_pos;"
-		"out vec4 v_normal;"
-		"void main() {"
-		"    v_color = a_color;"
-		"    v_pos = mv_mat * a_position;"
-		"    v_normal = -mv_mat * a_normal;"
-		"    gl_Position = p_mat * mv_mat * a_position;"
-		"}";
+const char* vertex_shader =
+	"#version 300 es\n"
+	"layout(location = 0) in vec4 a_position;"
+	"layout(location = 1) in vec4 a_normal;"
+	"layout(location = 2) in vec4 a_color;"
+	"uniform mat4 mv_mat;"
+	"uniform mat4 p_mat;"
+	"out vec4 v_color;"
+	"out vec4 v_pos;"
+	"out vec4 v_normal;"
+	"void main() {"
+	"    v_color = a_color;"
+	"    v_pos = mv_mat * a_position;"
+	"    v_normal = -mv_mat * a_normal;"
+	"    gl_Position = p_mat * mv_mat * a_position;"
+	"}";
 
 
-	const char fShaderStr[] =
-		"#version 300 es\n"
-		"precision mediump float;"
-		"in vec4 v_color;"
-		"in vec4 v_pos;"
-		"in vec4 v_normal;"
-		"uniform vec4 l_pos;"
-		"uniform vec4 l_color;"
-		"out vec4 o_fragColor;"
-		"void main() {"
-		"    float diff = 0.5 * max(dot(normalize(v_normal), normalize(l_pos - v_pos)), 0.0);"
-		"    vec4 diffuse_color = diff * l_color;"
-		"    float ambient = 0.1;"
-		"    vec4 ambient_color = ambient * l_color;"
-		"    vec4 h_vec = normalize(-v_pos + l_pos - v_pos);"
-		"    float spec = 0.6 * pow(max(dot(normalize(v_normal), h_vec), 0.0), 64.0);"
-		"    vec4 specular_color = spec * l_color;"
-		"    o_fragColor = v_color * (diffuse_color + ambient_color + specular_color);"
-		"}";
+const char* frag_shader =
+	"#version 300 es\n"
+	"precision mediump float;"
+	"in vec4 v_color;"
+	"in vec4 v_pos;"
+	"in vec4 v_normal;"
+	"uniform vec4 l_pos;"
+	"uniform vec4 l_color;"
+	"out vec4 o_fragColor;"
+	"void main() {"
+	"    float diff = 0.5 * max(dot(normalize(v_normal), normalize(l_pos - v_pos)), 0.0);"
+	"    vec4 diffuse_color = diff * l_color;"
+	"    float ambient = 0.1;"
+	"    vec4 ambient_color = ambient * l_color;"
+	"    vec4 h_vec = normalize(-v_pos + l_pos - v_pos);"
+	"    float spec = 0.6 * pow(max(dot(normalize(v_normal), h_vec), 0.0), 64.0);"
+	"    vec4 specular_color = spec * l_color;"
+	"    o_fragColor = v_color * (diffuse_color + ambient_color + specular_color);"
+	"}";
 
-	userData->programObject = esLoadProgram(vShaderStr, fShaderStr);
-	if (userData->programObject == 0) {
+
+typedef struct {
+	GLuint prog;
+	Model block, railway;
+} gameplay_data;
+
+int gameplay_init(ESContext *esContext, State* state) {
+	state->data = malloc(sizeof(gameplay_data));
+	if (state->data == NULL) {
+		return -1;
+	}
+	gameplay_data *data = state->data;
+
+	data->prog = esLoadProgram(vertex_shader, frag_shader);
+	if (data->prog == 0) {
 		return -1;
 	}
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glLineWidth(3.0);
 	glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+	glEnable(GL_CULL_FACE);
+	glViewport(0, 0, esContext->width, esContext->height);
 
-	int ret1 = model_init(&userData->block, "block.dat");
-	int ret2 = model_init(&userData->railway, "railway.dat");
+	int ret1 = model_init(&data->block, "block.dat");
+	int ret2 = model_init(&data->railway, "railway.dat");
 	if (ret1 != 0 || ret2 != 0) {
 		return -1;
 	}
@@ -84,12 +97,11 @@ void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, GLuint prog
 	glVertexAttrib3fv(2, vec_ptr(&model->color));
 	glDisableVertexAttribArray(2);
 
-	glEnable(GL_CULL_FACE);
 	glDrawArrays(GL_TRIANGLES, 0, model->length);
 }
 
-void gameplay_draw(ESContext *esContext) {
-	UserData *userData = esContext->userData;
+void gameplay_draw(ESContext *esContext, State* state) {
+	gameplay_data *data = state->data;
 
 	GLfloat color[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
 	GLfloat vertexPos[4 * 3] = {
@@ -117,11 +129,9 @@ void gameplay_draw(ESContext *esContext) {
 
 	mat_multiply(&mvp, &p_mat, &mv_mat);
 
-	glViewport(0, 0, esContext->width, esContext->height);
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(userData->programObject);
+	glUseProgram(data->prog);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vertexPos);
 	glEnableVertexAttribArray(0);
@@ -130,40 +140,50 @@ void gameplay_draw(ESContext *esContext) {
 	glVertexAttrib4fv(2, color);
 	glDisableVertexAttribArray(2);
 
-	GLuint mv_loc = glGetUniformLocation(userData->programObject, "mv_mat");
+	GLuint mv_loc = glGetUniformLocation(data->prog, "mv_mat");
 	glUniformMatrix4fv(mv_loc, 1, GL_TRUE, mat_ptr(&mv_mat));
-	GLuint p_loc = glGetUniformLocation(userData->programObject, "p_mat");
+	GLuint p_loc = glGetUniformLocation(data->prog, "p_mat");
 	glUniformMatrix4fv(p_loc, 1, GL_TRUE, mat_ptr(&p_mat));
 
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
 
 	Mat front_mat;
 	mat_translate(&front_mat, 0.0, 2.5, 0.0);
-	draw_obj(&userData->railway, &mv_mat, &p_mat, &front_mat, userData->programObject);
+	draw_obj(&data->railway, &mv_mat, &p_mat, &front_mat, data->prog);
 	mat_translate(&front_mat, -0.5, 2.5, 0.0);
-	draw_obj(&userData->railway, &mv_mat, &p_mat, &front_mat, userData->programObject);
+	draw_obj(&data->railway, &mv_mat, &p_mat, &front_mat, data->prog);
 	mat_translate(&front_mat, -1.0, 2.5, 0.0);
-	draw_obj(&userData->railway, &mv_mat, &p_mat, &front_mat, userData->programObject);
+	draw_obj(&data->railway, &mv_mat, &p_mat, &front_mat, data->prog);
 	mat_translate(&front_mat, 0.5, 2.5, 0.0);
-	draw_obj(&userData->railway, &mv_mat, &p_mat, &front_mat, userData->programObject);
+	draw_obj(&data->railway, &mv_mat, &p_mat, &front_mat, data->prog);
 	mat_translate(&front_mat, 1.0, 2.5, 0.0);
-	draw_obj(&userData->railway, &mv_mat, &p_mat, &front_mat, userData->programObject);
+	draw_obj(&data->railway, &mv_mat, &p_mat, &front_mat, data->prog);
 	mat_translate(&front_mat, -0.75, 2.0, 0.0);
-	draw_obj(&userData->block, &mv_mat, &p_mat, &front_mat, userData->programObject);
+	draw_obj(&data->block, &mv_mat, &p_mat, &front_mat, data->prog);
 	mat_translate(&front_mat, -0.25, 1.0, 0.0);
-	draw_obj(&userData->block, &mv_mat, &p_mat, &front_mat, userData->programObject);
+	draw_obj(&data->block, &mv_mat, &p_mat, &front_mat, data->prog);
 	mat_translate(&front_mat, 0.25, 3.0, 0.0);
-	draw_obj(&userData->block, &mv_mat, &p_mat, &front_mat, userData->programObject);
+	draw_obj(&data->block, &mv_mat, &p_mat, &front_mat, data->prog);
 	mat_translate(&front_mat, 0.75, 4.0, 0.0);
-	draw_obj(&userData->block, &mv_mat, &p_mat, &front_mat, userData->programObject);
+	draw_obj(&data->block, &mv_mat, &p_mat, &front_mat, data->prog);
 	mat_translate(&front_mat, 0.75, 0.5, 0.0);
-	draw_obj(&userData->block, &mv_mat, &p_mat, &front_mat, userData->programObject);
+	draw_obj(&data->block, &mv_mat, &p_mat, &front_mat, data->prog);
 }
 
-void gameplay_destroy(ESContext *esContext) {
-	UserData *userData = esContext->userData;
+void gameplay_destroy(ESContext *esContext, State* state) {
+	gameplay_data *data = state->data;
 
-	glDeleteProgram(userData->programObject);
-	model_destroy(&userData->block);
+	glDeleteProgram(data->prog);
+	model_destroy(&data->block);
+
+	free(data);
 }
+
+State gameplay_state = {
+	.init = gameplay_init,
+	.destroy = gameplay_destroy,
+	.update = NULL,
+	.draw = gameplay_draw,
+	.data = NULL
+};
 
