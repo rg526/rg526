@@ -9,6 +9,9 @@ bin/state.o: state.c
 bin/gameplay.o: gameplay.c
 	gcc gameplay.c -c -o bin/gameplay.o -Wall -Ies
 
+bin/note.o: note.c 
+	gcc note.c -c -o bin/note.o -Wall -Ies 
+
 bin/music.o: music.c
 	gcc music.c -c -o bin/music.o -Wall -Ies
 
@@ -30,8 +33,8 @@ bin/esUtil.o: es/esUtil.c
 bin/esUtil_X11.o: es/esUtil_X11.c
 	gcc es/esUtil_X11.c -c -o bin/esUtil_X11.o
 
-rg526: bin/state.o bin/gameplay.o bin/music.o bin/mat.o bin/vec.o bin/model.o bin/esShader.o bin/esUtil.o bin/esUtil_X11.o
-	gcc bin/state.o bin/gameplay.o bin/music.o bin/mat.o bin/vec.o bin/model.o bin/esShader.o bin/esUtil.o bin/esUtil_X11.o -lGLESv2 -lEGL -lX11 -lm -pthread -o rg526
+rg526: bin/state.o bin/gameplay.o bin/music.o bin/note.o bin/mat.o bin/vec.o bin/model.o bin/esShader.o bin/esUtil.o bin/esUtil_X11.o
+	gcc bin/state.o bin/gameplay.o bin/music.o  bin/note.o bin/mat.o bin/vec.o bin/model.o bin/esShader.o bin/esUtil.o bin/esUtil_X11.o -lGLESv2 -lEGL -lX11 -lm -pthread -o rg526
 
 clean:
 	rm -f bin/*.o rg526
