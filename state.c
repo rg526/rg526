@@ -23,11 +23,6 @@ int main () {
 	}
 
 	while (esUserInterrupt(&esContext) == GL_FALSE) {
-		InputLine L = input_query_clear(&input, 0);
-		if (L.active) {
-			printf("Active line 0\n");
-		}
-
 		if (state->update != NULL) {
 			StateChg change = state->update(&esContext, state);
 			if (change.ret == STATE_SWITCH_NOSAVE) {
