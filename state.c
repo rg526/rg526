@@ -2,20 +2,32 @@
 #include <string.h>
 #include "esUtil.h"
 #include "state.h"
+#include "input.h"
 #include "gameplay.h"
 
 int main () {
 	ESContext esContext;
 	memset(&esContext, 0, sizeof(esContext));
-
 	esCreateWindow(&esContext, "Title", 1600, 900, ES_WINDOW_RGB);
+
+	Input input;
+	if (input_init(&input, &esContext) != 0) {
+		fprintf(stderr, "Init input failed\n");
+		return 1;
+	}
 
 	State *state = &gameplay_state, *saved = NULL;
 	if (state->init(&esContext, state) != 0) {
+		fprintf(stderr, "Init state failed\n");
 		return 1;
 	}
 
 	while (esUserInterrupt(&esContext) == GL_FALSE) {
+		InputLine L = input_query_clear(&input, 0);
+		if (L.active) {
+			printf("Active line 0\n");
+		}
+
 		if (state->update != NULL) {
 			StateChg change = state->update(&esContext, state);
 			if (change.ret == STATE_SWITCH_NOSAVE) {
@@ -46,6 +58,7 @@ int main () {
 	}
 
 	state->destroy(&esContext, state);
+	input_destroy(&input);
 
 	return 0;
 }

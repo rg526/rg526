@@ -105,6 +105,10 @@ struct ESContext
    /// Put your user data here...
    void       *userData;
 
+
+   //Project rg526 input
+   void* rg526_input;
+
    /// Window width
    GLint       width;
 
