@@ -47,7 +47,7 @@ void input_clearall(Input* input) {
 	}
 }
 
-int input_init(Input* input, ESContext* esContext) {
+int input_init(Input* input, ESContext* esContext, GPIO* gpio) {
 	//Init input structure
 	for (size_t i = 0;i < INPUT_COUNT;i++) {
 		if (pthread_mutex_init(&input->lock[i], NULL) != 0) {
@@ -63,6 +63,7 @@ int input_init(Input* input, ESContext* esContext) {
 	esContext->rg526_input = input;
 	esContext->keyFunc = __input_keyboard_cb;
 	input->esContext = esContext;
+	input->gpio = gpio;
 	return 0;
 }
 
