@@ -35,7 +35,7 @@ int note_init(NoteArray* note, const char* filename)
         fscanf(f, "%f", &note_arr[i].end);
     }
     note->arr = note_arr;
-    qsort(note->arr, sizeof(NoteBlock), note->length, cmp);
+    //qsort(note->arr, sizeof(NoteBlock), note->length, cmp);
     fclose(f);
     return 0;
 }
