@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include <unistd.h>
 #include "esUtil.h"
 #include "input.h"
 
@@ -17,6 +18,28 @@ void __input_keyboard_cb(ESContext* esContext, unsigned char ch, int a, int b) {
 		input->v[line].active = 1;
 		input->v[line].tv = current_time;
 		pthread_mutex_unlock(&input->lock[line]);
+	}
+}
+
+void* __input_scan_gpio(void* ptr) {
+	Input* input = ptr;
+	while (true) {
+		pthread_testcancel();
+		for (size_t line = 0;line < INPUT_COUNT;line++) {
+			int status = gpio_input(input->gpio, line);
+			if (status) {
+				//Get time
+				struct timeval current_time;
+				gettimeofday(&current_time, NULL);
+
+				//Activate line
+				pthread_mutex_lock(&input->lock[line]);
+				input->v[line].active = 1;
+				input->v[line].tv = current_time;
+				pthread_mutex_unlock(&input->lock[line]);
+			}
+		}
+		usleep(2000);
 	}
 }
 
@@ -64,10 +87,17 @@ int input_init(Input* input, ESContext* esContext, GPIO* gpio) {
 	esContext->keyFunc = __input_keyboard_cb;
 	input->esContext = esContext;
 	input->gpio = gpio;
+
+	//Launch thread __input_scan_gpio
+	pthread_create(&input->gpio_scan_thread, NULL, __input_scan_gpio, input);
 	return 0;
 }
 
 void input_destroy(Input* input) {
+	//Terminate thread
+	pthread_cancel(input->gpio_scan_thread);
+	pthread_join(input->gpio_scan_thread, NULL);
+
 	//Destroy locks
 	for (size_t i = 0;i < INPUT_COUNT;i++) {
 		pthread_mutex_destroy(&input->lock[i]);

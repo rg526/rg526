@@ -19,6 +19,7 @@ typedef struct {
 	GPIO* gpio;
 	InputLine v[5];
 	pthread_mutex_t lock[5];
+	pthread_t gpio_scan_thread;
 } Input;
 
 int input_init(Input*, ESContext*, GPIO*);
