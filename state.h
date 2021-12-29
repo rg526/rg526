@@ -1,8 +1,15 @@
 #include "esUtil.h"
+#include "input.h"
+#include "music.h"
 #include "model.h"
 
 #ifndef __STATE_H__
 #define __STATE_H__
+
+typedef struct {
+	Music music;
+	Input input;
+} Device;
 
 enum StateRetType {
 	STATE_CONT,
@@ -17,7 +24,7 @@ typedef struct {
 } StateChg;
 
 typedef struct State {
-	int (*init)(ESContext*, struct State*);
+	int (*init)(ESContext*, struct State*, Device*);
 	void (*destroy)(ESContext*, struct State*);
 	StateChg (*update)(ESContext*, struct State*);
 	void (*draw)(ESContext*, struct State*);

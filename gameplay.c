@@ -4,6 +4,7 @@
 #include <math.h>
 #include "mat.h"
 #include "gameplay.h"
+#include "state.h"
 #include "music.h"
 #include "model.h"
 
@@ -49,16 +50,18 @@ const char* frag_shader =
 typedef struct {
 	GLuint prog;
 	Model block, railway;
-	Music music;
+	Device* dev;
 } gameplay_data;
 
-int gameplay_init(ESContext *esContext, State* state) {
+int gameplay_init(ESContext *esContext, State* state, Device* dev) {
 	state->data = malloc(sizeof(gameplay_data));
 	if (state->data == NULL) {
 		fprintf(stderr, "gameplay data malloc failed\n");
 		return -1;
 	}
 	gameplay_data *data = state->data;
+
+	data->dev = dev;
 
 	data->prog = esLoadProgram(vertex_shader, frag_shader);
 	if (data->prog == 0) {
@@ -79,10 +82,6 @@ int gameplay_init(ESContext *esContext, State* state) {
 		return -1;
 	}
 
-	if (music_init(&data->music) != 0) {
-		fprintf(stderr, "gameplay music init failed\n");
-		return -1;
-	}
 	return 0;
 }
 
@@ -197,7 +196,6 @@ void gameplay_destroy(ESContext *esContext, State* state) {
 	//Clear data components
 	glDeleteProgram(data->prog);
 	model_destroy(&data->block);
-	music_destroy(&data->music);
 
 	//Free data struct
 	free(data);

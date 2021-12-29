@@ -5,19 +5,34 @@
 #include "input.h"
 #include "gameplay.h"
 
+int device_init(Device* dev, ESContext *esContext) {
+	if (input_init(&dev->input, esContext) != 0) {
+		return 1;
+	}
+	if (music_init(&dev->music) != 0) {
+		return 1;
+	}
+	return 0;
+}
+
+void device_destroy(Device* dev) {
+	input_destroy(&dev->input);
+	music_destroy(&dev->music);
+}
+
 int main () {
 	ESContext esContext;
 	memset(&esContext, 0, sizeof(esContext));
 	esCreateWindow(&esContext, "Title", 1600, 900, ES_WINDOW_RGB);
 
-	Input input;
-	if (input_init(&input, &esContext) != 0) {
-		fprintf(stderr, "Init input failed\n");
+	Device device;
+	if (device_init(&device, &esContext) != 0) {
+		fprintf(stderr, "Init device failed\n");
 		return 1;
 	}
 
 	State *state = &gameplay_state, *saved = NULL;
-	if (state->init(&esContext, state) != 0) {
+	if (state->init(&esContext, state, &device) != 0) {
 		fprintf(stderr, "Init state failed\n");
 		return 1;
 	}
@@ -28,7 +43,7 @@ int main () {
 			if (change.ret == STATE_SWITCH_NOSAVE) {
 				state->destroy(&esContext, state);
 				state = change.next;
-				if (state->init(&esContext, state) != 0) {
+				if (state->init(&esContext, state, &device) != 0) {
 					fprintf(stderr, "state init failed\n");
 					return 1;
 				}
@@ -36,7 +51,7 @@ int main () {
 			} else if (change.ret == STATE_SWITCH_SAVE) {
 				saved = state;
 				state = change.next;
-				if (state->init(&esContext, state) != 0) {
+				if (state->init(&esContext, state, &device) != 0) {
 					fprintf(stderr, "state init failed\n");
 					return 1;
 				}
@@ -53,7 +68,7 @@ int main () {
 	}
 
 	state->destroy(&esContext, state);
-	input_destroy(&input);
+	device_destroy(&device);
 
 	return 0;
 }
