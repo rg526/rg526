@@ -4,6 +4,7 @@
 #include <math.h>
 #include "mat.h"
 #include "gameplay.h"
+#include "music.h"
 #include "model.h"
 
 const char* vertex_shader =
@@ -48,6 +49,7 @@ const char* frag_shader =
 typedef struct {
 	GLuint prog;
 	Model block, railway;
+	Music music;
 } gameplay_data;
 
 int gameplay_init(ESContext *esContext, State* state) {
@@ -74,6 +76,11 @@ int gameplay_init(ESContext *esContext, State* state) {
 	int ret2 = model_init(&data->railway, "railway.dat");
 	if (ret1 != 0 || ret2 != 0) {
 		fprintf(stderr, "gameplay model init failed\n");
+		return -1;
+	}
+
+	if (music_init(&data->music) != 0) {
+		fprintf(stderr, "gameplay music init failed\n");
 		return -1;
 	}
 	return 0;
@@ -187,9 +194,12 @@ void gameplay_draw(ESContext *esContext, State* state) {
 void gameplay_destroy(ESContext *esContext, State* state) {
 	gameplay_data *data = state->data;
 
+	//Clear data components
 	glDeleteProgram(data->prog);
 	model_destroy(&data->block);
+	music_destroy(&data->music);
 
+	//Free data struct
 	free(data);
 }
 
