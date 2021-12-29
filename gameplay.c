@@ -96,14 +96,14 @@ void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, GLuint prog
 	Mat t_mat;
 	mat_multiply(&t_mat, mv_mat, front_mat);
 
-	GLuint mv_loc = glGetUniformLocation(prog, "mv_mat");
+	GLint mv_loc = glGetUniformLocation(prog, "mv_mat");
 	glUniformMatrix4fv(mv_loc, 1, GL_TRUE, mat_ptr(&t_mat));
-	GLuint p_loc = glGetUniformLocation(prog, "p_mat");
+	GLint p_loc = glGetUniformLocation(prog, "p_mat");
 	glUniformMatrix4fv(p_loc, 1, GL_TRUE, mat_ptr(p_mat));
 
-	GLuint l_pos = glGetUniformLocation(prog, "l_pos");
+	GLint l_pos = glGetUniformLocation(prog, "l_pos");
 	glUniform4f(l_pos, 0.0, -30.0, 0.0, 0.0);
-	GLuint l_color = glGetUniformLocation(prog, "l_color");
+	GLint l_color = glGetUniformLocation(prog, "l_color");
 	glUniform4f(l_color, 1.0, 1.0, 1.0, 1.0);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), model->vertex);
@@ -156,14 +156,14 @@ void gameplay_draw(ESContext *esContext, State* state) {
 	glVertexAttrib4fv(2, color);
 	glDisableVertexAttribArray(2);
 
-	GLuint mv_loc = glGetUniformLocation(data->prog, "mv_mat");
+	GLint mv_loc = glGetUniformLocation(data->prog, "mv_mat");
 	glUniformMatrix4fv(mv_loc, 1, GL_TRUE, mat_ptr(&mv_mat));
-	GLuint p_loc = glGetUniformLocation(data->prog, "p_mat");
+	GLint p_loc = glGetUniformLocation(data->prog, "p_mat");
 	glUniformMatrix4fv(p_loc, 1, GL_TRUE, mat_ptr(&p_mat));
 
-	GLuint l_pos = glGetUniformLocation(data->prog, "l_pos");
+	GLint l_pos = glGetUniformLocation(data->prog, "l_pos");
 	glUniform4f(l_pos, 0.0, -30.0, 0.0, 0.0);
-	GLuint l_color = glGetUniformLocation(data->prog, "l_color");
+	GLint l_color = glGetUniformLocation(data->prog, "l_color");
 	glUniform4f(l_color, 1.0, 1.0, 1.0, 1.0);
 
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
