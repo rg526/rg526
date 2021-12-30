@@ -2,11 +2,15 @@
 #include <string.h>
 #include "esUtil.h"
 #include "state.h"
+#include "gpio.h"
 #include "input.h"
 #include "gameplay.h"
 
 int device_init(Device* dev, ESContext *esContext) {
-	if (input_init(&dev->input, esContext) != 0) {
+	if (gpio_init(&dev->gpio) != 0) {
+		return 1;
+	}
+	if (input_init(&dev->input, esContext, &dev->gpio) != 0) {
 		return 1;
 	}
 	if (music_init(&dev->music) != 0) {
@@ -18,6 +22,7 @@ int device_init(Device* dev, ESContext *esContext) {
 void device_destroy(Device* dev) {
 	input_destroy(&dev->input);
 	music_destroy(&dev->music);
+	gpio_destroy(&dev->gpio);
 }
 
 int main () {
