@@ -175,9 +175,9 @@ void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, Vec* overri
 	GLint l_color = glGetUniformLocation(prog, "l_color");
 	glUniform4f(l_color, 1.0, 1.0, 1.0, 1.0);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), model->vertex);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), model->data);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), model->normal);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), model->data + model->length);
 	glEnableVertexAttribArray(1);
 	if (override_color == NULL) {
 		glVertexAttrib3fv(2, vec_ptr(&model->color));
@@ -249,7 +249,7 @@ void gameplay_draw(ESContext *esContext, State* state) {
 	
 	for(int i=0; i < data->note.length; i++){		
 		if(data->note.arr[i].notetype == NOTE_LONG){
-			double start_pos = 1+(data->note.arr[i].start - data->timeelapsed)*(data->speed);;
+			double start_pos = 1+(data->note.arr[i].start - data->timeelapsed)*(data->speed);
 			double end_pos = 1+(data->note.arr[i].end - data->timeelapsed)*(data->speed);
 			if(start_pos > 5 || end_pos < 0) continue;
 			if(start_pos < 0) start_pos = 0;
@@ -309,6 +309,7 @@ void gameplay_destroy(ESContext *esContext, State* state) {
 	note_destroy(&data->note);
 	glDeleteProgram(data->prog);
 	model_destroy(&data->block);
+	model_destroy(&data->railway);
 
 	//Free data struct
 	free(data);

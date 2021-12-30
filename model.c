@@ -34,11 +34,10 @@ int model_init(Model* mod, const char* filename) {
 		mod->length += 3 * (s_arr[i] - 2);
 	}
 
-	vertex = malloc(mod->length * sizeof(Vec));
-	normal = malloc(mod->length * sizeof(Vec));
-	if (vertex == NULL || normal == NULL) goto fail;
-	mod->vertex = vertex;
-	mod->normal = normal;
+	vertex = malloc(2 * mod->length * sizeof(Vec));
+	if (vertex == NULL) goto fail;
+	normal = vertex + mod->length;
+	mod->data = vertex;
 
 	for (size_t i = 0;i < mod->m;i++) {
 		for (size_t j = 1;j < s_arr[i] - 1;j++) {
@@ -77,12 +76,10 @@ fail:
 		free(i_arr);
 	}
 	if (vertex != NULL) free(vertex);
-	if (normal != NULL) free(normal);
 	fclose(f);
 	return -1;
 }
 
 void model_destroy(Model* mod) {
-	free(mod->vertex);
-	free(mod->normal);
+	free(mod->data);
 }

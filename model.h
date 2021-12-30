@@ -8,8 +8,7 @@
 typedef struct Model {
 	size_t n, m, length;
 	Vec color;
-	Vec* vertex;
-	Vec* normal;
+	Vec* data;
 } Model;
 
 int model_init(Model*, const char*);
