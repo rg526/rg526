@@ -161,7 +161,7 @@ StateChg gameplay_update(ESContext *esContext, State* state) {
 	return change;
 }
 
-void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, GLuint prog) {
+void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, Vec* override_color, GLuint prog) {
 	Mat t_mat;
 	mat_multiply(&t_mat, mv_mat, front_mat);
 
@@ -179,7 +179,11 @@ void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, GLuint prog
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), model->normal);
 	glEnableVertexAttribArray(1);
-	glVertexAttrib3fv(2, vec_ptr(&model->color));
+	if (override_color == NULL) {
+		glVertexAttrib3fv(2, vec_ptr(&model->color));
+	} else {
+		glVertexAttrib3fv(2, vec_ptr(override_color));
+	}
 	glDisableVertexAttribArray(2);
 
 	glDrawArrays(GL_TRIANGLES, 0, model->length);
@@ -240,27 +244,36 @@ void gameplay_draw(ESContext *esContext, State* state) {
 	Mat front_mat;
 	for (int i = -2; i < 3; i+=1){
 		mat_translate(&front_mat, i*0.5, 2.5, 0.0);
-		draw_obj(&data->railway, &mv_mat, &p_mat, &front_mat, data->prog);
+		draw_obj(&data->railway, &mv_mat, &p_mat, &front_mat, NULL, data->prog);
 	}
 	
 	for(int i=0; i < data->note.length; i++){		
 		if(data->note.arr[i].notetype == NOTE_LONG){
 			double start_pos = 1+(data->note.arr[i].start - data->timeelapsed)*(data->speed);;
 			double end_pos = 1+(data->note.arr[i].end - data->timeelapsed)*(data->speed);
-			if(start_pos > 5 || end_pos<0) continue;
-			else{
-				if(end_pos > 5){
-					end_pos = 5;}
-				if(start_pos < 0){
-					start_pos = 0;
-				}
-				Mat scaleup;
+			if(start_pos > 5 || end_pos < 0) continue;
+			if(start_pos < 0) start_pos = 0;
+			if(end_pos > 5) end_pos = 5;
+
+			if (!data->judge[i]) {
+				Mat scaleup, translate;
 				mat_scale(&scaleup, 1.0, (end_pos - start_pos)/0.1, 1.0);
-				Mat translate;
 				mat_translate(&translate, (float)(data->note.arr[i].pos)*(0.5) - 1.25, (end_pos + start_pos)/2 , 0.0);
-				Mat output;
-				mat_multiply(&output, &translate, &scaleup);
-				draw_obj(&data->block, &mv_mat, &p_mat, &output, data->prog);
+
+				mat_multiply(&front_mat, &translate, &scaleup);
+				draw_obj(&data->block, &mv_mat, &p_mat, &front_mat, NULL, data->prog);
+			} else {
+				Vec active_color;
+				active_color.v[0] = 0.953;
+				active_color.v[1] = 0.588;
+				active_color.v[2] = 0.290;
+
+				Mat scaleup, translate;
+				mat_scale(&scaleup, 1.0, (end_pos - start_pos)/0.1, 2.0);
+				mat_translate(&translate, (float)(data->note.arr[i].pos)*(0.5) - 1.25, (end_pos + start_pos)/2 , 0.0);
+
+				mat_multiply(&front_mat, &translate, &scaleup);
+				draw_obj(&data->block, &mv_mat, &p_mat, &front_mat, &active_color, data->prog);
 			}
 		}
 		else { 
@@ -268,11 +281,22 @@ void gameplay_draw(ESContext *esContext, State* state) {
 			if((y_pos<0) || (y_pos>5)){
 				continue;
 			}
-			//printf("%f\n", y_pos);
-			mat_translate(&front_mat, (float)(data->note.arr[i].pos)*(0.5) - 1.25, y_pos , 0.0);
-			//mat_translate(&front_mat, (-0.75), 2.0, 0.0);
-			//printf("%zu\n", (data->note.arr[i].pos));
-			draw_obj(&data->block, &mv_mat, &p_mat, &front_mat, data->prog);
+
+			if (!data->judge[i]) {
+				mat_translate(&front_mat, (float)(data->note.arr[i].pos)*(0.5) - 1.25, y_pos , 0.0);
+				draw_obj(&data->block, &mv_mat, &p_mat, &front_mat, NULL, data->prog);
+			} else {
+				Vec active_color;
+				active_color.v[0] = 0.953;
+				active_color.v[1] = 0.588;
+				active_color.v[2] = 0.290;
+
+				Mat scaleup, translate;
+				mat_scale(&scaleup, 1.0, 1.0, 2.0);
+				mat_translate(&translate, (float)(data->note.arr[i].pos)*(0.5) - 1.25, y_pos , 0.0);
+				mat_multiply(&front_mat, &translate, &scaleup);
+				draw_obj(&data->block, &mv_mat, &p_mat, &front_mat, &active_color, data->prog);
+			}
 		}
 	}
 }
