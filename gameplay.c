@@ -56,6 +56,9 @@ typedef struct {
 	float speed;
 	NoteArray note;
 	struct timeval abstime; 
+	double timeelapsed;
+	int score;
+	int* judge;
 } GameplayData;
 
 int gameplay_init(ESContext *esContext, State* state, Device* dev) {
@@ -75,15 +78,28 @@ int gameplay_init(ESContext *esContext, State* state, Device* dev) {
 
 	data->dev = dev;
 
+	data->timeelapsed = 0;
+
+	data->score = 0;
+
 	if (note_init(&data->note, "note.dat") != 0){
 		free(data);
 		return -1;
 		}
 
+	data->judge = malloc(data->note.length * sizeof(int));
+	if(data->judge == NULL){
+		note_destroy(&data->note);
+		free(data);
+		return -1;
+	}
+	memset(data->judge, 0, data->note.length * sizeof(int) );
+
 	int ret1 = model_init(&data->block, "block.dat");
 	int ret2 = model_init(&data->railway, "railway.dat");
 	if (ret1 != 0 || ret2 != 0) {
 		fprintf(stderr, "gameplay model init failed\n");
+		free(&data->judge);
 		note_destroy(&data->note);
 		free(data);
 		return -1;
@@ -92,6 +108,7 @@ int gameplay_init(ESContext *esContext, State* state, Device* dev) {
     data->prog = esLoadProgram(vertex_shader, frag_shader);
 	if (data->prog == 0) {
 		fprintf(stderr, "gameplay shader load failed\n");
+		free(&data->judge);
 		note_destroy(&data->note);
 		model_destroy(&data->block);
 		model_destroy(&data->railway);
@@ -108,6 +125,24 @@ int gameplay_init(ESContext *esContext, State* state, Device* dev) {
 }
 
 StateChg gameplay_update(ESContext *esContext, State* state) {
+	GameplayData* data = state->data;
+	struct timeval currenttime;
+	gettimeofday(&currenttime, NULL); 
+	data->timeelapsed = (double)(currenttime.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - data->abstime.tv_usec));
+	for(size_t i = 0; i < data->note.length; i++){
+		float touchtime = data->note.arr[i].start;
+		if(abs(data->timeelapsed - touchtime) < 0.1 && data->judge[i] ==0){
+			InputLine line = input_query_clear(&data->dev->input, data->note.arr[i].pos);
+			if (!line.active) continue;
+			double deltatime = (double)(line.tv.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(line.tv.tv_usec - data->abstime.tv_usec));
+			if(abs(deltatime - touchtime) < 0.1 ){
+				data->score ++;
+				data->judge[i] = 1;
+			}
+		}
+	}
+	printf("%d\n", data->score);
+
 	StateChg change;
 	change.ret = STATE_CONT;
 	return change;
@@ -194,13 +229,11 @@ void gameplay_draw(ESContext *esContext, State* state) {
 		mat_translate(&front_mat, i*0.5, 2.5, 0.0);
 		draw_obj(&data->railway, &mv_mat, &p_mat, &front_mat, data->prog);
 	}
-	struct timeval currenttime;
-	gettimeofday(&currenttime, NULL); 
-	double deltatime = (double)(currenttime.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - data->abstime.tv_usec));
+	
 	for(int i=0; i < data->note.length; i++){		
 		if(data->note.arr[i].notetype == NOTE_LONG){
-			double start_pos = 1+(data->note.arr[i].start - deltatime)*(data->speed);;
-			double end_pos = 1+(data->note.arr[i].end - deltatime)*(data->speed);
+			double start_pos = 1+(data->note.arr[i].start - data->timeelapsed)*(data->speed);;
+			double end_pos = 1+(data->note.arr[i].end - data->timeelapsed)*(data->speed);
 			if(start_pos > 5 || end_pos<0) continue;
 			else{
 				if(end_pos > 5){
@@ -218,7 +251,7 @@ void gameplay_draw(ESContext *esContext, State* state) {
 			}
 		}
 		else { 
-			double y_pos = 1+(data->note.arr[i].start - deltatime)*(data->speed);
+			double y_pos = 1+(data->note.arr[i].start - data->timeelapsed)*(data->speed);
 			if((y_pos<0) || (y_pos>5)){
 				continue;
 			}
@@ -235,6 +268,7 @@ void gameplay_destroy(ESContext *esContext, State* state) {
 	GameplayData *data = state->data;
 
 	//Clear data components
+	free(data->judge);
 	note_destroy(&data->note);
 	glDeleteProgram(data->prog);
 	model_destroy(&data->block);
