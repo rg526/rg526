@@ -51,6 +51,7 @@ const char* frag_shader =
 
 typedef struct {
 	GLuint prog;
+	GLuint vbuffer;
 	Model block, railway;
 	Device* dev;
 	float speed;
@@ -121,6 +122,9 @@ int gameplay_init(ESContext *esContext, State* state, Device* dev) {
 	glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 	glEnable(GL_CULL_FACE);
 	glViewport(0, 0, esContext->width, esContext->height);
+
+	glGenBuffers(1, &data->vbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, data->vbuffer);
 	return 0;
 }
 
@@ -161,10 +165,15 @@ StateChg gameplay_update(ESContext *esContext, State* state) {
 	return change;
 }
 
+void set_obj_data(Model* model) {
+	glBufferData(GL_ARRAY_BUFFER, 2 * model->length * sizeof(Vec), model->data,  GL_DYNAMIC_DRAW);
+}
+
 void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, Vec* override_color, GLuint prog) {
 	Mat t_mat;
 	mat_multiply(&t_mat, mv_mat, front_mat);
 
+	//Set uniform
 	GLint mv_loc = glGetUniformLocation(prog, "mv_mat");
 	glUniformMatrix4fv(mv_loc, 1, GL_TRUE, mat_ptr(&t_mat));
 	GLint p_loc = glGetUniformLocation(prog, "p_mat");
@@ -175,10 +184,12 @@ void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, Vec* overri
 	GLint l_color = glGetUniformLocation(prog, "l_color");
 	glUniform4f(l_color, 1.0, 1.0, 1.0, 1.0);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), model->data);
+	//Set attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), (void*)(0));
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), model->data + model->length);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vec), (void*)(model->length * sizeof(Vec)));
 	glEnableVertexAttribArray(1);
+
 	if (override_color == NULL) {
 		glVertexAttrib3fv(2, vec_ptr(&model->color));
 	} else {
@@ -192,16 +203,8 @@ void draw_obj(Model* model, Mat* mv_mat, Mat* p_mat, Mat* front_mat, Vec* overri
 void gameplay_draw(ESContext *esContext, State* state) {
 	GameplayData *data = state->data;
 
-	GLfloat color[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
-	GLfloat vertexPos[4 * 3] = {
-		-1, 0, 0,
-		1, 0, 0,
-		1, 5, 0,
-		-1, 5, 0
-	};
-
+	//Matrix transformation
 	Mat scl, swp, trl, rot, persp;
-
 	mat_scale(&scl, 56.0, 24.0, 24.0);
 	mat_swapyz(&swp);
 	mat_translate(&trl, 0.0, -80.0, 36.0);
@@ -210,43 +213,26 @@ void gameplay_draw(ESContext *esContext, State* state) {
 	mat_projection(&persp, -14.0, 14.0, -14.0 * aspect, 14.0 * aspect, 20.0, 180.0);
 
 	Mat mv_mat, p_mat, mvp;
-
 	mat_multiply(&mv_mat, &swp, &scl);
 	mat_multiply(&mv_mat, &trl, &mv_mat);
 	mat_multiply(&mv_mat, &rot, &mv_mat);
 	mat_copy(&p_mat, &persp);
-
 	mat_multiply(&mvp, &p_mat, &mv_mat);
 
+	//Clear screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	glUseProgram(data->prog);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vertexPos);
-	glEnableVertexAttribArray(0);
-	glVertexAttrib3f(1, 0.0, 0.0, 1.0);
-	glDisableVertexAttribArray(1);
-	glVertexAttrib4fv(2, color);
-	glDisableVertexAttribArray(2);
-
-	GLint mv_loc = glGetUniformLocation(data->prog, "mv_mat");
-	glUniformMatrix4fv(mv_loc, 1, GL_TRUE, mat_ptr(&mv_mat));
-	GLint p_loc = glGetUniformLocation(data->prog, "p_mat");
-	glUniformMatrix4fv(p_loc, 1, GL_TRUE, mat_ptr(&p_mat));
-
-	GLint l_pos = glGetUniformLocation(data->prog, "l_pos");
-	glUniform4f(l_pos, 0.0, -30.0, 0.0, 0.0);
-	GLint l_color = glGetUniformLocation(data->prog, "l_color");
-	glUniform4f(l_color, 1.0, 1.0, 1.0, 1.0);
-
-	glDrawArrays(GL_LINE_LOOP, 0, 4);
-
+	//Draw railway model
+	set_obj_data(&data->railway);
 	Mat front_mat;
 	for (int i = -2; i < 3; i+=1){
 		mat_translate(&front_mat, i*0.5, 2.5, 0.0);
 		draw_obj(&data->railway, &mv_mat, &p_mat, &front_mat, NULL, data->prog);
 	}
 	
+	//Draw block model
+	set_obj_data(&data->block);
 	for(int i=0; i < data->note.length; i++){		
 		if(data->note.arr[i].notetype == NOTE_LONG){
 			double start_pos = 1+(data->note.arr[i].start - data->timeelapsed)*(data->speed);
@@ -307,9 +293,12 @@ void gameplay_destroy(ESContext *esContext, State* state) {
 	//Clear data components
 	free(data->judge);
 	note_destroy(&data->note);
-	glDeleteProgram(data->prog);
 	model_destroy(&data->block);
 	model_destroy(&data->railway);
+
+	//Delete program and vertex buffer object
+	glDeleteProgram(data->prog);
+	glDeleteBuffers(1, &data->vbuffer);
 
 	//Free data struct
 	free(data);
