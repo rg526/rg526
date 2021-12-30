@@ -129,18 +129,31 @@ StateChg gameplay_update(ESContext *esContext, State* state) {
 	struct timeval currenttime;
 	gettimeofday(&currenttime, NULL); 
 	data->timeelapsed = (double)(currenttime.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - data->abstime.tv_usec));
-	for(size_t i = 0; i < data->note.length; i++){
-		float touchtime = data->note.arr[i].start;
-		if(abs(data->timeelapsed - touchtime) < 0.1 && data->judge[i] ==0){
-			InputLine line = input_query_clear(&data->dev->input, data->note.arr[i].pos);
-			if (!line.active) continue;
-			double deltatime = (double)(line.tv.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(line.tv.tv_usec - data->abstime.tv_usec));
-			if(abs(deltatime - touchtime) < 0.1 ){
-				data->score ++;
-				data->judge[i] = 1;
+	for(size_t i = 0; i < data->note.length; i++)
+		if (data->note.arr[i].notetype == NOTE_SHORT){
+			float touchtime = data->note.arr[i].start;
+			if(abs(data->timeelapsed - touchtime) < 0.1 && data->judge[i] ==0){
+				InputLine line = input_query_clear(&data->dev->input, data->note.arr[i].pos);
+				if (!line.active) continue;
+				double deltatime = (double)(line.tv.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(line.tv.tv_usec - data->abstime.tv_usec));
+				if(abs(deltatime - touchtime) < 0.1 ){
+					data->score ++;
+					data->judge[i] = 1;
+				}
 			}
 		}
-	}
+		else{
+			if( (data->timeelapsed > data->note.arr[i].start - 0.1) && ((data->timeelapsed < data->note.arr[i].end + 0.1)) && data->judge[i] ==0){
+				InputLine line = input_query_clear(&data->dev->input, data->note.arr[i].pos);
+				if (!line.active) continue;
+				double deltatime = (double)(line.tv.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(line.tv.tv_usec - data->abstime.tv_usec));
+				if((deltatime > data->note.arr[i].start - 0.1) && ((deltatime < data->note.arr[i].end + 0.1))){
+					data->score ++;
+					data->judge[i] = 1;
+				}
+			}
+		}
+		
 	printf("%d\n", data->score);
 
 	StateChg change;
