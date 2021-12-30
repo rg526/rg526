@@ -71,7 +71,7 @@ int gameplay_init(ESContext *esContext, State* state, Device* dev) {
 		return -1;
 	}
 
-	data->speed = 5.0 / 2.0; 
+	data->speed = 5.0 / 4.0; 
 
 	data->dev = dev;
 
@@ -197,16 +197,37 @@ void gameplay_draw(ESContext *esContext, State* state) {
 	struct timeval currenttime;
 	gettimeofday(&currenttime, NULL); 
 	double deltatime = (double)(currenttime.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - data->abstime.tv_usec));
-	for(int i=0; i < data->note.length; i++){
-		double y_pos = 5+(data->note.arr[i].start - deltatime)*(data->speed);
-		if((y_pos<0) || (y_pos>5)){
-			continue;
+	for(int i=0; i < data->note.length; i++){		
+		if(data->note.arr[i].notetype == NOTE_LONG){
+			double start_pos = 1+(data->note.arr[i].start - deltatime)*(data->speed);;
+			double end_pos = 1+(data->note.arr[i].end - deltatime)*(data->speed);
+			if(start_pos > 5 || end_pos<0) continue;
+			else{
+				if(end_pos > 5){
+					end_pos = 5;}
+				if(start_pos < 0){
+					start_pos = 0;
+				}
+				Mat scaleup;
+				mat_scale(&scaleup, 1.0, (end_pos - start_pos)/0.1, 1.0);
+				Mat translate;
+				mat_translate(&translate, (float)(data->note.arr[i].pos)*(0.5) - 1.25, (end_pos + start_pos)/2 , 0.0);
+				Mat output;
+				mat_multiply(&output, &translate, &scaleup);
+				draw_obj(&data->block, &mv_mat, &p_mat, &output, data->prog);
+			}
 		}
-		//printf("%f\n", y_pos);
-		mat_translate(&front_mat, (float)(data->note.arr[i].pos)*(0.5) - 1.25, y_pos , 0.0);
-		//mat_translate(&front_mat, (-0.75), 2.0, 0.0);
-		//printf("%zu\n", (data->note.arr[i].pos));
-		draw_obj(&data->block, &mv_mat, &p_mat, &front_mat, data->prog);
+		else { 
+			double y_pos = 1+(data->note.arr[i].start - deltatime)*(data->speed);
+			if((y_pos<0) || (y_pos>5)){
+				continue;
+			}
+			//printf("%f\n", y_pos);
+			mat_translate(&front_mat, (float)(data->note.arr[i].pos)*(0.5) - 1.25, y_pos , 0.0);
+			//mat_translate(&front_mat, (-0.75), 2.0, 0.0);
+			//printf("%zu\n", (data->note.arr[i].pos));
+			draw_obj(&data->block, &mv_mat, &p_mat, &front_mat, data->prog);
+		}
 	}
 }
 
