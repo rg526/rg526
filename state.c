@@ -5,6 +5,8 @@
 #include "gpio.h"
 #include "input.h"
 #include "gameplay.h"
+#include "image.h"
+#include "text.h"
 
 int device_init(Device* dev, ESContext *esContext) {
 	if (gpio_init(&dev->gpio) != 0) {
@@ -16,6 +18,12 @@ int device_init(Device* dev, ESContext *esContext) {
 	if (music_init(&dev->music) != 0) {
 		return 1;
 	}
+	if (image_init(&dev->image, esContext) != 0) {
+		return 1;
+	}
+	if (text_init(&dev->text, "Poppins-ExtraLight.ttf", &dev->image) != 0) {
+		return 1;
+	}
 	return 0;
 }
 
@@ -23,6 +31,8 @@ void device_destroy(Device* dev) {
 	input_destroy(&dev->input);
 	music_destroy(&dev->music);
 	gpio_destroy(&dev->gpio);
+	text_destroy(&dev->text);
+	image_destroy(&dev->image);
 }
 
 int main () {
