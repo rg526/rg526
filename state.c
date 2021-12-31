@@ -78,7 +78,6 @@ int main () {
 			}
 		}
 		if (state->draw != NULL) state->draw(&esContext, state);
-        text_draw(&device.text, "aaa", 1300, 800, 1.0);
 		eglSwapBuffers(esContext.eglDisplay, esContext.eglSurface);
 	}
 

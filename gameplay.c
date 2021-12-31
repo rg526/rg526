@@ -285,6 +285,9 @@ void gameplay_draw(ESContext *esContext, State* state) {
 			}
 		}
 	}
+	char st[20];
+	snprintf(st, 20, "%d", data->score);
+	text_draw(&data->dev->text, st, 0.8 * esContext->width, 0.8 * esContext->height, esContext->width / 1600.0);
 }
 
 void gameplay_destroy(ESContext *esContext, State* state) {
