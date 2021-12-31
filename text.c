@@ -19,14 +19,20 @@ int text_init(Text* T, const char* Filename, Image* I)
     return 0;
 }
 
-void text_draw(Text* T, char c, int x_cord, int y_cord, float scale)
+void text_draw(Text* T, char* c, float x_cord, float y_cord, float scale)
 {
-    FT_Load_Char(T->face, c, FT_LOAD_RENDER);
-    float x_pos = x_cord + T->face->glyph->bitmap_left * scale;
-    float y_pos = y_cord - (T->face->glyph->bitmap.rows - T->face->glyph->bitmap_top) * scale; 
-    float width = (float)(T->face->glyph->bitmap.width) * scale;
-    float height = (float)(T->face->glyph->bitmap.rows )* scale;
-    image_draw(T->image, x_pos, y_pos, width, height, T->face->glyph->bitmap.width, T->face->glyph->bitmap.rows, T->face->glyph->bitmap.buffer);
+	while (*c) {
+		FT_Load_Char(T->face, *c, FT_LOAD_RENDER);
+		float x_pos = x_cord + T->face->glyph->bitmap_left * scale;
+		float y_pos = y_cord - (T->face->glyph->bitmap.rows - T->face->glyph->bitmap_top) * scale; 
+		float width = (float)(T->face->glyph->bitmap.width) * scale;
+		float height = (float)(T->face->glyph->bitmap.rows )* scale;
+
+		image_draw(T->image, x_pos, y_pos, width, height, T->face->glyph->bitmap.width, T->face->glyph->bitmap.rows, T->face->glyph->bitmap.buffer);
+
+		c++;
+		x_cord += scale * (T->face->glyph->advance.x / 64.0);
+	}
 }
 
 void text_destroy(Text* T)
