@@ -19,7 +19,7 @@ int text_init(Text* T, const char* Filename, Image* I)
     return 0;
 }
 
-void text_draw(Text* T, char* c, float x_cord, float y_cord, float scale)
+void text_draw(Text* T, char* c, float x_cord, float y_cord, float scale, Vec* color)
 {
 	while (*c) {
 		FT_Load_Char(T->face, *c, FT_LOAD_RENDER);
@@ -28,7 +28,7 @@ void text_draw(Text* T, char* c, float x_cord, float y_cord, float scale)
 		float width = (float)(T->face->glyph->bitmap.width) * scale;
 		float height = (float)(T->face->glyph->bitmap.rows )* scale;
 
-		image_draw(T->image, x_pos, y_pos, width, height, T->face->glyph->bitmap.width, T->face->glyph->bitmap.rows, T->face->glyph->bitmap.buffer);
+		image_draw(T->image, x_pos, y_pos, width, height, T->face->glyph->bitmap.width, T->face->glyph->bitmap.rows, T->face->glyph->bitmap.buffer, color);
 
 		c++;
 		x_cord += scale * (T->face->glyph->advance.x / 64.0);

@@ -287,7 +287,12 @@ void gameplay_draw(ESContext *esContext, State* state) {
 	}
 	char st[20];
 	snprintf(st, 20, "%d", data->score);
-	text_draw(&data->dev->text, st, 0.8 * esContext->width, 0.8 * esContext->height, esContext->width / 1600.0);
+
+	Vec color;
+	color.v[0] = 1.0;
+	color.v[1] = 0.5;
+	color.v[2] = 0.0;
+	text_draw(&data->dev->text, st, 0.8 * esContext->width, 0.8 * esContext->height, esContext->width / 1600.0, &color);
 }
 
 void gameplay_destroy(ESContext *esContext, State* state) {

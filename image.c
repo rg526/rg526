@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "esUtil.h"
+#include "vec.h"
 #include "image.h"
 
 const char* image_vertex_shader = 
@@ -21,7 +22,7 @@ const char* image_frag_shader =
 	"in vec2 v_textcord;"
 	"out vec4 o_fragcolor;"
 	"void main() {"
-	"    o_fragcolor = f_color * texture(s_text, v_textcord).r;"
+	"    o_fragcolor = f_color * texture(s_text, v_textcord);"
 	"}";
 
 int image_init(Image* image, ESContext *esContext) {
@@ -42,7 +43,7 @@ int image_init(Image* image, ESContext *esContext) {
 	return 0;
 }
 
-void image_draw(Image* image, float x, float y, float w, float h, float image_w, float image_h, void* image_data) {
+void image_draw(Image* image, float x, float y, float w, float h, float image_w, float image_h, void* image_data, Vec* color) {
 	//Use program
 	glUseProgram(image->prog);
 
@@ -52,7 +53,7 @@ void image_draw(Image* image, float x, float y, float w, float h, float image_w,
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, image_w, image_h, 0, GL_RED, GL_UNSIGNED_BYTE, image_data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, image_w, image_h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, image_data);
 	glActiveTexture(GL_TEXTURE0);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -75,7 +76,7 @@ void image_draw(Image* image, float x, float y, float w, float h, float image_w,
 	
 
 	GLint f_color = glGetUniformLocation(image->prog, "f_color");
-	glUniform4f(f_color, 0.88f, 0.59f, 0.07f, 1.0);
+	glUniform4f(f_color, color->v[0], color->v[1], color->v[2], 1.0);
 	GLint proj_loc = glGetUniformLocation(image->prog, "projection");
 	glUniformMatrix4fv(proj_loc, 1, GL_TRUE, mat_ptr(&image->projection));
 
