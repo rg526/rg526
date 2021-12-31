@@ -136,11 +136,11 @@ StateChg gameplay_update(ESContext *esContext, State* state) {
 	for(size_t i = 0; i < data->note.length; i++)
 		if (data->note.arr[i].notetype == NOTE_SHORT){
 			float touchtime = data->note.arr[i].start;
-			if(abs(data->timeelapsed - touchtime) < 0.1 && data->judge[i] ==0){
+			if(fabs(data->timeelapsed - touchtime) < 0.1 && data->judge[i] ==0){
 				InputLine line = input_query_clear(&data->dev->input, data->note.arr[i].pos);
 				if (!line.active) continue;
 				double deltatime = (double)(line.tv.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(line.tv.tv_usec - data->abstime.tv_usec));
-				if(abs(deltatime - touchtime) < 0.1 ){
+				if(fabs(deltatime - touchtime) < 0.1 ){
 					data->score ++;
 					data->judge[i] = 1;
 				}
@@ -163,6 +163,33 @@ StateChg gameplay_update(ESContext *esContext, State* state) {
 	StateChg change;
 	change.ret = STATE_CONT;
 	return change;
+}
+
+void draw_line(Mat* mv_mat, Mat* p_mat, Vec* override_color, GLuint prog) {
+	//Set vertex and normal data
+	GLfloat line_data[12] = {-1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0};
+	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(Vec), line_data,  GL_DYNAMIC_DRAW);
+
+	//Set uniform
+	GLint mv_loc = glGetUniformLocation(prog, "mv_mat");
+	glUniformMatrix4fv(mv_loc, 1, GL_TRUE, mat_ptr(mv_mat));
+	GLint p_loc = glGetUniformLocation(prog, "p_mat");
+	glUniformMatrix4fv(p_loc, 1, GL_TRUE, mat_ptr(p_mat));
+
+	GLint l_pos = glGetUniformLocation(prog, "l_pos");
+	glUniform4f(l_pos, 0.0, -30.0, 0.0, 0.0);
+	GLint l_color = glGetUniformLocation(prog, "l_color");
+	glUniform4f(l_color, 1.0, 1.0, 1.0, 1.0);
+
+	//Set attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(6 * sizeof(GLfloat)));
+
+	glVertexAttrib3fv(2, vec_ptr(override_color));
+	glDisableVertexAttribArray(2);
+
+	glDrawArrays(GL_LINES, 0, 2);
 }
 
 void set_obj_data(Model* model) {
@@ -223,6 +250,13 @@ void gameplay_draw(ESContext *esContext, State* state) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(data->prog);
 
+	//Draw judge line
+	Vec line_color;
+	line_color.v[0] = 1.0;
+	line_color.v[1] = 0.0;
+	line_color.v[2] = 1.0;
+	draw_line(&mv_mat, &p_mat, &line_color, data->prog);
+
 	//Draw railway model
 	set_obj_data(&data->railway);
 	Mat front_mat;
@@ -233,7 +267,7 @@ void gameplay_draw(ESContext *esContext, State* state) {
 	
 	//Draw block model
 	set_obj_data(&data->block);
-	for(int i=0; i < data->note.length; i++){		
+	for(size_t i=0; i < data->note.length; i++){
 		if(data->note.arr[i].notetype == NOTE_LONG){
 			double start_pos = 1+(data->note.arr[i].start - data->timeelapsed)*(data->speed);
 			double end_pos = 1+(data->note.arr[i].end - data->timeelapsed)*(data->speed);
