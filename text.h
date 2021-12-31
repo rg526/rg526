@@ -14,6 +14,8 @@ typedef struct{
 
 int text_init(Text*, const char*, Image*);
 
+void text_draw(Text*, char, int x_cord, int y_cord, float); 
+
 void text_destroy(Text*);
 
 #endif

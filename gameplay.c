@@ -158,7 +158,7 @@ StateChg gameplay_update(ESContext *esContext, State* state) {
 			}
 		}
 		
-	printf("%d\n", data->score);
+	//printf("%d\n", data->score);
 
 	StateChg change;
 	change.ret = STATE_CONT;
