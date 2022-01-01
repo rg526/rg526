@@ -44,26 +44,18 @@ int image_init(Image* image, ESContext *esContext) {
 }
 
 void image_draw(Image* image, float x, float y, float w, float h, float image_w, float image_h, void* image_data, Vec* color) {
+	GLuint texture = image_load(image, image_w, image_h, image_data, color);
+	image_render(image, x, y, w, h, texture, color);
+	image_unload(image, texture);
+}
+
+void image_render(Image* image, float x, float y, float w, float h, GLuint texture, Vec* color) {
 	//Use program
 	glUseProgram(image->prog);
 
-	//Create texture
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	if (color == NULL) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_w, image_h, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
-	} else {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, image_w, image_h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, image_data);
-	}
+	//Activate texture
 	glActiveTexture(GL_TEXTURE0);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, texture);
 
 	//Prepare rectangle
 	GLfloat rect_vertices[24] = {
@@ -89,6 +81,33 @@ void image_draw(Image* image, float x, float y, float w, float h, float image_w,
 
 	//Draw image
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+GLuint image_load(Image* image, float image_w, float image_h, void* image_data, Vec* color) {
+	//Create texture
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	if (color == NULL) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_w, image_h, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+	} else {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, image_w, image_h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, image_data);
+	}
+
+	//Set texture parameter
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	return texture;
+}
+
+void image_unload(Image* image, GLuint texture) {
+	//Delete texture
+	glDeleteTextures(1, &texture);
 }
 
 void image_destroy(Image* image) {
