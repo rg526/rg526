@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include "esUtil.h"
 #include "state.h"
 #include "gpio.h"
@@ -40,14 +41,18 @@ int main () {
 	memset(&esContext, 0, sizeof(esContext));
 	esCreateWindow(&esContext, "Title", 1600, 900, ES_WINDOW_RGB);
 
-	Device device;
-	if (device_init(&device, &esContext) != 0) {
+	Device* device = malloc(sizeof(Device));
+	if (device == NULL) {
+		fprintf(stderr, "Device malloc failed\n");
+		return 1;
+	}
+	if (device_init(device, &esContext) != 0) {
 		fprintf(stderr, "Init device failed\n");
 		return 1;
 	}
 
 	State *state = &gameplay_state, *saved = NULL;
-	if (state->init(&esContext, state, &device) != 0) {
+	if (state->init(&esContext, state, device) != 0) {
 		fprintf(stderr, "Init state failed\n");
 		return 1;
 	}
@@ -58,7 +63,7 @@ int main () {
 			if (change.ret == STATE_SWITCH_NOSAVE) {
 				state->destroy(&esContext, state);
 				state = change.next;
-				if (state->init(&esContext, state, &device) != 0) {
+				if (state->init(&esContext, state, device) != 0) {
 					fprintf(stderr, "state init failed\n");
 					return 1;
 				}
@@ -66,7 +71,7 @@ int main () {
 			} else if (change.ret == STATE_SWITCH_SAVE) {
 				saved = state;
 				state = change.next;
-				if (state->init(&esContext, state, &device) != 0) {
+				if (state->init(&esContext, state, device) != 0) {
 					fprintf(stderr, "state init failed\n");
 					return 1;
 				}
@@ -74,6 +79,9 @@ int main () {
 			} else if (change.ret == STATE_SWITCH_RESTORE) {
 				state->destroy(&esContext, state);
 				state = saved;
+				if (state->resume != NULL) {
+					state->resume(&esContext, state);
+				}
 				continue;
 			}
 		}
@@ -82,7 +90,8 @@ int main () {
 	}
 
 	state->destroy(&esContext, state);
-	device_destroy(&device);
+	device_destroy(device);
+	free(device);
 
 	return 0;
 }

@@ -125,10 +125,16 @@ int gameplay_init(ESContext *esContext, State* state, Device* dev) {
 
 	glGenBuffers(1, &data->vbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, data->vbuffer);
+
 	return 0;
 }
 
+void gameplay_resume(ESContext *esContext, State* state) {
+	//TODO: resume music playback on resume
+}
+
 StateChg gameplay_update(ESContext *esContext, State* state) {
+	//Judge notes
 	GameplayData* data = state->data;
 	struct timeval currenttime;
 	gettimeofday(&currenttime, NULL); 
@@ -158,8 +164,7 @@ StateChg gameplay_update(ESContext *esContext, State* state) {
 			}
 		}
 		
-	//printf("%d\n", data->score);
-
+	//Continue gameplay
 	StateChg change;
 	change.ret = STATE_CONT;
 	return change;
@@ -349,6 +354,7 @@ void gameplay_destroy(ESContext *esContext, State* state) {
 State gameplay_state = {
 	.init = gameplay_init,
 	.destroy = gameplay_destroy,
+	.resume = gameplay_resume,
 	.update = gameplay_update,
 	.draw = gameplay_draw,
 	.data = NULL

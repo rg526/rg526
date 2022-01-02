@@ -32,6 +32,7 @@ typedef struct {
 typedef struct State {
 	int (*init)(ESContext*, struct State*, Device*);
 	void (*destroy)(ESContext*, struct State*);
+	void (*resume)(ESContext*, struct State*);
 	StateChg (*update)(ESContext*, struct State*);
 	void (*draw)(ESContext*, struct State*);
 	void* data;
