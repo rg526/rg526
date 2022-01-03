@@ -65,12 +65,25 @@ int gameplay_init(ESContext *esContext, State* state, Device* dev) {
 void gameplay_resume(ESContext *esContext, State* state) {
 	GameplayData* data = state->data;
 
+	//Reset time
 	gettimeofday(&data->abstime, NULL);
+
 	//TODO: resume music playback on resume
 }
 
 StateChg gameplay_update(ESContext *esContext, State* state) {
 	GameplayData* data = state->data;
+
+	//Test pause button
+	InputLine pause_line = input_query_clear(&data->dev->input, 0);
+	if (pause_line.active) {
+		input_clearall(&data->dev->input);
+
+		StateChg change;
+		change.ret = STATE_SWITCH_SAVE;
+		change.next = &pausemode_state;
+		return change;
+	}
 
 	//Get current time
 	struct timeval currenttime;
