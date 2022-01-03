@@ -5,7 +5,7 @@
 #include "state.h"
 #include "gpio.h"
 #include "input.h"
-#include "gameplay.h"
+#include "playmode.h"
 #include "image.h"
 #include "text.h"
 
@@ -51,7 +51,7 @@ int main () {
 		return 1;
 	}
 
-	State *state = &gameplay_state, *saved = NULL;
+	State *state = &playmode_state, *saved = NULL;
 	if (state->init(&esContext, state, device) != 0) {
 		fprintf(stderr, "Init state failed\n");
 		return 1;

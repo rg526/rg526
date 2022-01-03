@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "mat.h"
-#include "gameplay.h"
+#include "playmode.h"
 #include "state.h"
 #include "music.h"
 #include "model.h"
@@ -21,15 +21,15 @@ typedef struct {
 	int score;
 	int* judge;
 	ModeDisplay modedisplay;
-} GameplayData;
+} PlaymodeData;
 
-int gameplay_init(ESContext *esContext, State* state, Device* dev) {
-	state->data = malloc(sizeof(GameplayData));
+int playmode_init(ESContext *esContext, State* state, Device* dev) {
+	state->data = malloc(sizeof(PlaymodeData));
 	if (state->data == NULL) {
-		fprintf(stderr, "gameplay data malloc failed\n");
+		fprintf(stderr, "playmode data malloc failed\n");
 		return -1;
 	}
-	GameplayData *data = state->data;
+	PlaymodeData *data = state->data;
 
 	if (gettimeofday(&data->abstime, NULL) != 0){
 		free(data);
@@ -63,8 +63,8 @@ int gameplay_init(ESContext *esContext, State* state, Device* dev) {
 	return 0;
 }
 
-void gameplay_resume(ESContext *esContext, State* state) {
-	GameplayData* data = state->data;
+void playmode_resume(ESContext *esContext, State* state) {
+	PlaymodeData* data = state->data;
 
 	//Reset time
 	gettimeofday(&data->abstime, NULL);
@@ -72,8 +72,8 @@ void gameplay_resume(ESContext *esContext, State* state) {
 	//TODO: resume music playback on resume
 }
 
-StateChg gameplay_update(ESContext *esContext, State* state) {
-	GameplayData* data = state->data;
+StateChg playmode_update(ESContext *esContext, State* state) {
+	PlaymodeData* data = state->data;
 
 	//Test pause button
 	InputLine pause_line = input_query_clear(&data->dev->input, 0);
@@ -122,15 +122,15 @@ StateChg gameplay_update(ESContext *esContext, State* state) {
 			}
 		}
 		
-	//Continue gameplay
+	//Continue playmode
 	StateChg change;
 	change.ret = STATE_CONT;
 	return change;
 }
 
 
-void gameplay_draw(ESContext *esContext, State* state) {
-	GameplayData *data = state->data;
+void playmode_draw(ESContext *esContext, State* state) {
+	PlaymodeData *data = state->data;
     modedisplay_draw(&data->modedisplay, data->timeelapsed);
 
 	char st[20];
@@ -143,8 +143,8 @@ void gameplay_draw(ESContext *esContext, State* state) {
 	text_draw(&data->dev->text, st, 0.8 * esContext->width, 0.8 * esContext->height, esContext->width / 1600.0, &color);
 }
 
-void gameplay_destroy(ESContext *esContext, State* state) {
-	GameplayData *data = state->data;
+void playmode_destroy(ESContext *esContext, State* state) {
+	PlaymodeData *data = state->data;
 
 	//Clear data components
     modedisplay_destroy(&data->modedisplay);
@@ -155,12 +155,12 @@ void gameplay_destroy(ESContext *esContext, State* state) {
 	free(data);
 }
 
-State gameplay_state = {
-	.init = gameplay_init,
-	.destroy = gameplay_destroy,
-	.resume = gameplay_resume,
-	.update = gameplay_update,
-	.draw = gameplay_draw,
+State playmode_state = {
+	.init = playmode_init,
+	.destroy = playmode_destroy,
+	.resume = playmode_resume,
+	.update = playmode_update,
+	.draw = playmode_draw,
 	.data = NULL
 };
 
