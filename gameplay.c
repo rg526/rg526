@@ -11,9 +11,6 @@
 #include "modedisplay.h"
 #include <sys/time.h>
 
-
-
-
 typedef struct {
 	Device* dev;
 	float speed;
@@ -39,11 +36,8 @@ int gameplay_init(ESContext *esContext, State* state, Device* dev) {
 	}
 
 	data->speed = 5.0 / 4.0; 
-
 	data->dev = dev;
-
 	data->timeelapsed = 0;
-
 	data->score = 0;
 
 	if (note_init(&data->note, "note.dat") != 0){
@@ -75,9 +69,11 @@ void gameplay_resume(ESContext *esContext, State* state) {
 StateChg gameplay_update(ESContext *esContext, State* state) {
 	//Judge notes
 	GameplayData* data = state->data;
+
 	struct timeval currenttime;
 	gettimeofday(&currenttime, NULL); 
 	data->timeelapsed = (double)(currenttime.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - data->abstime.tv_usec));
+
 	for(size_t i = 0; i < data->note.length; i++)
 		if (data->note.arr[i].notetype == NOTE_SHORT){
 			float touchtime = data->note.arr[i].start;
@@ -113,6 +109,7 @@ StateChg gameplay_update(ESContext *esContext, State* state) {
 void gameplay_draw(ESContext *esContext, State* state) {
 	GameplayData *data = state->data;
     modedisplay_draw(&data->modedisplay, data->timeelapsed);
+
 	char st[20];
 	snprintf(st, 20, "%d", data->score);
 
@@ -127,9 +124,9 @@ void gameplay_destroy(ESContext *esContext, State* state) {
 	GameplayData *data = state->data;
 
 	//Clear data components
+    modedisplay_destroy(&data->modedisplay);
 	free(data->judge);
 	note_destroy(&data->note);
-    modedisplay_destroy(&data->modedisplay);
 	
 	//Free data struct
 	free(data);
