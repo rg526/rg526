@@ -10,6 +10,7 @@
 #include "note.h"
 #include "modedisplay.h"
 #include <sys/time.h>
+#include "pausemode.h"
 
 typedef struct {
 	Device* dev;
