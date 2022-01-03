@@ -13,7 +13,7 @@ bin/%.o: %.c
 bin/%.o: es/%.c
 	gcc $^ -c -o $@ $(INCDIR)
 
-rg526: bin/state.o bin/gameplay.o bin/image.o bin/text.o bin/music.o bin/note.o bin/input.o bin/gpio.o bin/mat.o bin/vec.o bin/model.o bin/esShader.o bin/esUtil.o bin/esUtil_X11.o
+rg526: bin/state.o bin/gameplay.o bin/image.o bin/text.o bin/music.o bin/note.o bin/input.o bin/gpio.o bin/mat.o bin/vec.o bin/model.o bin/modedisplay.o bin/esShader.o bin/esUtil.o bin/esUtil_X11.o
 	gcc $^ -o $@ $(CFLAGS) $(INCDIR) $(LIBS)
 
 clean:
