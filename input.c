@@ -23,7 +23,7 @@ void __input_keyboard_cb(ESContext* esContext, unsigned char ch, int a, int b) {
 
 void* __input_scan_gpio(void* ptr) {
 	Input* input = ptr;
-	while (true) {
+	while (1) {
 		pthread_testcancel();
 		for (size_t line = 0;line < INPUT_COUNT;line++) {
 			int status = gpio_input(input->gpio, line);

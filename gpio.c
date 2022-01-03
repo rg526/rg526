@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <gpiod.h>
 #include "gpio.h"
 
 const char* gpio_chipname = "gpiochip0";

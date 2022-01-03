@@ -1,4 +1,6 @@
+#ifdef RASPI
 #include <gpiod.h>
+#endif
 
 #ifndef __GPIO_H__
 #define __GPIO_H__
@@ -7,8 +9,10 @@
 #define GPIO_OUT_CNT 4
 
 typedef struct {
+#ifdef RASPI
 	struct gpiod_chip* chip;
 	struct gpiod_line *in[GPIO_IN_CNT], *out[GPIO_OUT_CNT];
+#endif
 } GPIO;
 
 extern const char* gpio_chipname;

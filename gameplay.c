@@ -170,7 +170,7 @@ StateChg gameplay_update(ESContext *esContext, State* state) {
 	return change;
 }
 
-void draw_line(Mat* mv_mat, Mat* p_mat, Vec* override_color, GLuint prog) {
+void draw_line(Mat* mv_mat, Mat* p_mat, Vec* override_color, GLfloat line_width, GLuint prog) {
 	//Set vertex and normal data
 	GLfloat line_data[12] = {-1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0};
 	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(Vec), line_data,  GL_DYNAMIC_DRAW);
@@ -194,6 +194,7 @@ void draw_line(Mat* mv_mat, Mat* p_mat, Vec* override_color, GLuint prog) {
 	glVertexAttrib3fv(2, vec_ptr(override_color));
 	glDisableVertexAttribArray(2);
 
+	glLineWidth(line_width);
 	glDrawArrays(GL_LINES, 0, 2);
 }
 
@@ -260,7 +261,7 @@ void gameplay_draw(ESContext *esContext, State* state) {
 	line_color.v[0] = 1.0;
 	line_color.v[1] = 0.0;
 	line_color.v[2] = 1.0;
-	draw_line(&mv_mat, &p_mat, &line_color, data->prog);
+	draw_line(&mv_mat, &p_mat, &line_color, 10.0, data->prog);
 
 	//Draw railway model
 	set_obj_data(&data->railway);
