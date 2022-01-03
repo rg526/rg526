@@ -63,24 +63,32 @@ int gameplay_init(ESContext *esContext, State* state, Device* dev) {
 }
 
 void gameplay_resume(ESContext *esContext, State* state) {
+	GameplayData* data = state->data;
+
+	gettimeofday(&data->abstime, NULL);
 	//TODO: resume music playback on resume
 }
 
 StateChg gameplay_update(ESContext *esContext, State* state) {
-	//Judge notes
 	GameplayData* data = state->data;
 
+	//Get current time
 	struct timeval currenttime;
 	gettimeofday(&currenttime, NULL); 
-	data->timeelapsed = (double)(currenttime.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - data->abstime.tv_usec));
 
+	//Update time elapsed
+	data->timeelapsed += ((double)(currenttime.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - data->abstime.tv_usec)));
+	data->abstime = currenttime;
+
+	//Judge notes
 	for(size_t i = 0; i < data->note.length; i++)
 		if (data->note.arr[i].notetype == NOTE_SHORT){
 			float touchtime = data->note.arr[i].start;
 			if(fabs(data->timeelapsed - touchtime) < 0.1 && data->judge[i] ==0){
 				InputLine line = input_query_clear(&data->dev->input, data->note.arr[i].pos);
 				if (!line.active) continue;
-				double deltatime = (double)(line.tv.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(line.tv.tv_usec - data->abstime.tv_usec));
+
+				double deltatime = data->timeelapsed - ((double)(currenttime.tv_sec - line.tv.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - line.tv.tv_usec)));
 				if(fabs(deltatime - touchtime) < 0.1 ){
 					data->score ++;
 					data->judge[i] = 1;
@@ -91,7 +99,8 @@ StateChg gameplay_update(ESContext *esContext, State* state) {
 			if( (data->timeelapsed > data->note.arr[i].start - 0.1) && ((data->timeelapsed < data->note.arr[i].end + 0.1)) && data->judge[i] ==0){
 				InputLine line = input_query_clear(&data->dev->input, data->note.arr[i].pos);
 				if (!line.active) continue;
-				double deltatime = (double)(line.tv.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(line.tv.tv_usec - data->abstime.tv_usec));
+
+				double deltatime = data->timeelapsed - ((double)(currenttime.tv_sec - line.tv.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - line.tv.tv_usec)));
 				if((deltatime > data->note.arr[i].start - 0.1) && ((deltatime < data->note.arr[i].end + 0.1))){
 					data->score ++;
 					data->judge[i] = 1;
