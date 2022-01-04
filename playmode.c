@@ -41,7 +41,7 @@ int playmode_init(ESContext *esContext, State* state, Device* dev) {
 	data->timeelapsed = 0;
 	data->score = 0;
 
-	if (note_init(&data->note, "note.dat") != 0){
+	if (note_init(&data->note, "note_long.dat") != 0){
 		free(data);
 		return -1;
 	}
