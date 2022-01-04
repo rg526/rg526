@@ -133,7 +133,7 @@ void playmode_draw(ESContext *esContext, State* state) {
 	PlaymodeData *data = state->data;
     modedisplay_draw(&data->modedisplay, data->timeelapsed);
 
-	char st[20];
+	char st[21];
 	snprintf(st, 20, "%d", data->score);
 
 	Vec color;
