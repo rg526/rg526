@@ -145,7 +145,7 @@ void playmode_draw(ESContext *esContext, State* state) {
 	color.v[0] = 1.0;
 	color.v[1] = 0.5;
 	color.v[2] = 0.0;
-	text_draw(&data->dev->text, st, 0.8, 0.8, 1.0, &color);
+	text_draw(&data->dev->textregular, st, 0.8, 0.8, 1.0, &color);
 }
 
 void playmode_destroy(ESContext *esContext, State* state) {

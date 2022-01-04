@@ -31,7 +31,10 @@ int device_init(Device* dev, ESContext *esContext) {
 	if (image_init(&dev->image, esContext) != 0) {
 		return 1;
 	}
-	if (text_init(&dev->text, "Poppins-ExtraLight.ttf", &dev->image, esContext) != 0) {
+	if (text_init(&dev->textregular, "Poppins/Poppins-Regular.ttf", &dev->image, esContext) != 0) {
+		return 1;
+	}
+	if (text_init(&dev->textbold, "Poppins/Poppins-Bold.ttf", &dev->image, esContext) != 0) {
 		return 1;
 	}
 
@@ -46,7 +49,8 @@ void device_destroy(Device* dev) {
 	input_destroy(&dev->input);
 	gpio_destroy(&dev->gpio);
 	music_destroy(&dev->music);
-	text_destroy(&dev->text);
+	text_destroy(&dev->textregular);
+	text_destroy(&dev->textbold);
 	image_destroy(&dev->image);
 }
 

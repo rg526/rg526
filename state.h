@@ -20,7 +20,8 @@ typedef struct {
 	Music music;
 	Input input;
 	GPIO gpio;
-	Text text;
+	Text textregular;
+	Text textbold;
 	Image image;
 
 	float speed;

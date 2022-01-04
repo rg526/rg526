@@ -51,7 +51,7 @@ void homemode_draw(ESContext* esContext, State* state)
 	color.v[0] = 1.0;
 	color.v[1] = 0.5;
 	color.v[2] = 0.0;
-	text_draw(&data->dev->text, "Press 0 to Start the Game" , 0.3, 0.55, 0.5, &color);
+	text_draw(&data->dev->textregular, "Press 0 to Start the Game" , 0.3, 0.55, 0.5, &color);
 }
 
 State homemode_state = {
