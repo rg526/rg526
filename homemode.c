@@ -45,13 +45,13 @@ StateChg homemode_update(ESContext* esContext, State* state)
 void homemode_draw(ESContext* esContext, State* state)
 {
     HomemodeData* data = state->data;
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     
 	Vec color;
 	color.v[0] = 1.0;
 	color.v[1] = 0.5;
 	color.v[2] = 0.0;
-	text_draw(&data->dev->text, "Press 0 to Start the Game" , 0.3 * esContext->width, 0.55 * esContext->height, 0.5 * esContext->width / 1600.0, &color);
+	text_draw(&data->dev->text, "Press 0 to Start the Game" , 0.3, 0.55, 0.5, &color);
 }
 
 State homemode_state = {

@@ -131,6 +131,11 @@ StateChg playmode_update(ESContext *esContext, State* state) {
 
 void playmode_draw(ESContext *esContext, State* state) {
 	PlaymodeData *data = state->data;
+
+	//Clear screen
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	//Draw disp
     modedisplay_draw(&data->modedisplay, data->timeelapsed);
 
 	char st[21];
@@ -140,7 +145,7 @@ void playmode_draw(ESContext *esContext, State* state) {
 	color.v[0] = 1.0;
 	color.v[1] = 0.5;
 	color.v[2] = 0.0;
-	text_draw(&data->dev->text, st, 0.8 * esContext->width, 0.8 * esContext->height, esContext->width / 1600.0, &color);
+	text_draw(&data->dev->text, st, 0.8, 0.8, 1.0, &color);
 }
 
 void playmode_destroy(ESContext *esContext, State* state) {

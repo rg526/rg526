@@ -4,9 +4,10 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-int text_init(Text* T, const char* Filename, Image* I)
+int text_init(Text* T, const char* Filename, Image* I, ESContext* esContext)
 {
     T->image = I;
+	T->esContext = esContext;
     if (FT_Init_FreeType(&T->ft)){
         printf("Fail to Init FreeType Library");
         return -1;
@@ -35,6 +36,9 @@ int text_init(Text* T, const char* Filename, Image* I)
 
 void text_draw(Text* T, char* c, float x_cord, float y_cord, float scale, Vec* color)
 {
+	x_cord *= T->esContext->width;
+	y_cord *= T->esContext->height;
+	scale *= T->esContext->width / 1600.0;
 	while (*c) {
 		size_t ch = *(c++);
 		float x_pos = x_cord + T->left[ch] * scale;
@@ -42,7 +46,7 @@ void text_draw(Text* T, char* c, float x_cord, float y_cord, float scale, Vec* c
 		float width = T->width[ch] * scale;
 		float height = T->rows[ch] * scale;
 
-		image_render(T->image, x_pos, y_pos, width, height, T->texture[ch], color);
+		image_render(T->image, x_pos / T->esContext->width, y_pos / T->esContext->height, width / T->esContext->width, height / T->esContext->height, T->texture[ch], color);
 		x_cord += scale * T->advancex[ch];
 	}
 }
