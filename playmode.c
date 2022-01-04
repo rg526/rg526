@@ -36,12 +36,12 @@ int playmode_init(ESContext *esContext, State* state, Device* dev) {
 		return -1;
 	}
 
-	data->speed = 5.0 / 4.0; 
+	data->speed = dev->speed;
 	data->dev = dev;
 	data->timeelapsed = 0;
 	data->score = 0;
 
-	if (note_init(&data->note, "note_long.dat") != 0){
+	if (note_init(&data->note, dev->select->note_file) != 0){
 		free(data);
 		return -1;
 	}

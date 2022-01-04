@@ -10,11 +10,21 @@
 #define __STATE_H__
 
 typedef struct {
+	char* note_file;
+	char* music_file;
+	char* name;
+} UserSelect;
+extern UserSelect select_options[];
+
+typedef struct {
 	Music music;
 	Input input;
 	GPIO gpio;
 	Text text;
 	Image image;
+
+	float speed;
+	UserSelect* select;
 } Device;
 
 enum StateRetType {

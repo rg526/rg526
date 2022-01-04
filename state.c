@@ -10,6 +10,14 @@
 #include "text.h"
 #include "homemode.h"
 
+UserSelect select_options[] = {
+	{
+		.note_file = "note_long.dat",
+		.music_file = "???.mp3",
+		.name = "NAME",
+	}
+};
+
 int device_init(Device* dev, ESContext *esContext) {
 	if (gpio_init(&dev->gpio) != 0) {
 		return 1;
@@ -26,6 +34,11 @@ int device_init(Device* dev, ESContext *esContext) {
 	if (text_init(&dev->text, "Poppins-ExtraLight.ttf", &dev->image, esContext) != 0) {
 		return 1;
 	}
+
+	//Init speed and filename
+	dev->speed = 5.0 / 4.0;
+	dev->select = &select_options[0];
+
 	return 0;
 }
 
