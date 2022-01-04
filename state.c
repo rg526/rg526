@@ -40,7 +40,7 @@ int device_init(Device* dev, ESContext *esContext) {
 	if (text_init(&dev->textregular, "Poppins/Poppins-Regular.ttf", &dev->image, esContext) != 0) {
 		return 1;
 	}
-	if (text_init(&dev->textbold, "Poppins/Poppins-Bold.ttf", &dev->image, esContext) != 0) {
+	if (text_init(&dev->textbold, "Poppins/Poppins-ExtraBold.ttf", &dev->image, esContext) != 0) {
 		return 1;
 	}
 

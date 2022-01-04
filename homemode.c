@@ -20,9 +20,9 @@ int homemode_init(ESContext* esContext, State* state, Device* dev)
     }
     HomemodeData* data = state->data;
     data->dev = dev; 
-	unsigned char button_buffer[3] = {24, 84, 170}; 
+	unsigned char button_buffer[3] = {68, 193, 247}; 
 	data->button = image_load(&dev->image, 1, 1, button_buffer, 3);
-	unsigned char active_button_buffer[3] = {128, 0, 0}; 
+	unsigned char active_button_buffer[3] = {69, 193, 247}; 
 	data->active_button = image_load(&dev->image, 1, 1, active_button_buffer, 3);
 	data->count = 2;
 	data->current = 0;
