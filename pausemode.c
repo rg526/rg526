@@ -21,9 +21,9 @@ int pausemode_init(ESContext* esContext, State* state, Device* dev)
     PausemodeData* data = state->data;
     data->dev = dev; 
 
-	unsigned char blank_buffer[3] = {128, 128, 128};
-	unsigned char button_buffer[3] = {24, 84, 170};
-	unsigned char active_button_buffer[3] = {128, 0, 0};
+	unsigned char blank_buffer[3] = {69, 193, 247};
+	unsigned char button_buffer[3] = {74,150, 243};
+	unsigned char active_button_buffer[3] = {74, 150, 243};
 	data->blank = image_load(&dev->image, 1, 1, blank_buffer, 3);
 	data->button = image_load(&dev->image, 1, 1, button_buffer, 3);
 	data->active_button = image_load(&dev->image, 1, 1, active_button_buffer, 3);
