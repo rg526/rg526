@@ -6,6 +6,7 @@
 typedef struct{
     Device* dev;
 	GLuint blank;
+	GLuint button;
 } PausemodeData;
 
 
@@ -20,7 +21,9 @@ int pausemode_init(ESContext* esContext, State* state, Device* dev)
     data->dev = dev; 
 
 	unsigned char blank_buffer[3] = {128, 128, 128};
+	unsigned char button_buffer[3] = {24, 84, 170};
 	data->blank = image_load(&dev->image, 1, 1, blank_buffer, 3);
+	data->button = image_load(&dev->image, 1, 1, button_buffer, 3);
 
     return 0;
 }
@@ -28,6 +31,7 @@ int pausemode_init(ESContext* esContext, State* state, Device* dev)
 void pausemode_destroy(ESContext* esContext, State* state){
     PausemodeData* data = state->data;
 	image_unload(&data->dev->image, data->blank);
+	image_unload(&data->dev->image, data->button);
     free(state->data);
 }
 
@@ -63,15 +67,18 @@ StateChg pausemode_update(ESContext* esContext, State* state)
 void pausemode_draw(ESContext* esContext, State* state)
 {
     PausemodeData* data = state->data;
+    
+	image_render(&data->dev->image, 0.3, 0.3, 0.4, 0.4, data->blank, NULL);
 
-	image_render(&data->dev->image, 0.4, 0.4, 0.3, 0.3, data->blank, NULL);
+	image_render(&data->dev->image, 0.35, 0.55, 0.3, 0.1, data->button, NULL);
+	image_render(&data->dev->image, 0.35, 0.35, 0.3, 0.1, data->button, NULL);
 
 	Vec color;
-	color.v[0] = 1.0;
-	color.v[1] = 0.5;
+	color.v[0] = 0.0;
+	color.v[1] = 0.0;
 	color.v[2] = 0.0;
-	text_draw(&data->dev->textregular, "Press 0 to resume" , 0.42, 0.6, 0.5, &color);
-	text_draw(&data->dev->textregular, "Press 1 to exit" , 0.42, 0.5, 0.5, &color);
+	text_draw(&data->dev->textregular, "Resume" , 0.4285, 0.58, 0.6, &color);
+	text_draw(&data->dev->textregular, "Exit" , 0.4715, 0.376, 0.6, &color);
 }
 
 State pausemode_state = {
