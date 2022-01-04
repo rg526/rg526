@@ -131,6 +131,11 @@ StateChg playmode_update(ESContext *esContext, State* state) {
 
 void playmode_draw(ESContext *esContext, State* state) {
 	PlaymodeData *data = state->data;
+
+	//Clear screen
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	//Draw disp
     modedisplay_draw(&data->modedisplay, data->timeelapsed);
 
 	char st[21];

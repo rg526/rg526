@@ -45,7 +45,7 @@ StateChg homemode_update(ESContext* esContext, State* state)
 void homemode_draw(ESContext* esContext, State* state)
 {
     HomemodeData* data = state->data;
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     
 	Vec color;
 	color.v[0] = 1.0;

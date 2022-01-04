@@ -147,8 +147,7 @@ void modedisplay_draw(ModeDisplay* D, double time)
 	mat_copy(&p_mat, &persp);
 	mat_multiply(&mvp, &p_mat, &mv_mat);
 
-	//Clear screen
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//Use program
 	glUseProgram(D->prog);
 
 	//Draw judge line
