@@ -8,6 +8,7 @@
 #include "playmode.h"
 #include "image.h"
 #include "text.h"
+#include "homemode.h"
 
 int device_init(Device* dev, ESContext *esContext) {
 	if (gpio_init(&dev->gpio) != 0) {
@@ -51,7 +52,7 @@ int main () {
 		return 1;
 	}
 
-	State *state = &playmode_state, *saved = NULL;
+	State *state = &homemode_state, *saved = NULL;
 	if (state->init(&esContext, state, device) != 0) {
 		fprintf(stderr, "Init state failed\n");
 		return 1;
