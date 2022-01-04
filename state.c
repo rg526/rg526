@@ -23,7 +23,7 @@ int device_init(Device* dev, ESContext *esContext) {
 	if (image_init(&dev->image, esContext) != 0) {
 		return 1;
 	}
-	if (text_init(&dev->text, "Poppins-ExtraLight.ttf", &dev->image) != 0) {
+	if (text_init(&dev->text, "Poppins-ExtraLight.ttf", &dev->image, esContext) != 0) {
 		return 1;
 	}
 	return 0;

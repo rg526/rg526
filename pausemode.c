@@ -64,15 +64,14 @@ void pausemode_draw(ESContext* esContext, State* state)
 {
     PausemodeData* data = state->data;
 
-	image_render(&data->dev->image, 0.4 * esContext->width, 0.4 * esContext->height, 0.3 * esContext->width, 0.30 * esContext->height, data->blank, NULL);
+	image_render(&data->dev->image, 0.4, 0.4, 0.3, 0.3, data->blank, NULL);
 
 	Vec color;
 	color.v[0] = 1.0;
 	color.v[1] = 0.5;
 	color.v[2] = 0.0;
-	text_draw(&data->dev->text, "Press 0 to resume" , 0.42 * esContext->width, 0.6 * esContext->height, 0.5 * esContext->width / 1600.0, &color);
-	text_draw(&data->dev->text, "Press 1 to exit" , 0.42 * esContext->width, 0.5 * esContext->height, 0.5 * esContext->width / 1600.0, &color);
-
+	text_draw(&data->dev->text, "Press 0 to resume" , 0.42, 0.6, 0.5, &color);
+	text_draw(&data->dev->text, "Press 1 to exit" , 0.42, 0.5, 0.5, &color);
 }
 
 State pausemode_state = {

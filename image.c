@@ -48,8 +48,8 @@ int image_init(Image* image, ESContext *esContext) {
 	glBindBuffer(GL_ARRAY_BUFFER, image->vbuffer);
 
 	Mat trl, scl;
-	mat_translate(&trl, -(float)(esContext->width) / 2.0, -(float)(esContext->height) / 2.0, 0.0);
-	mat_scale(&scl, 2.0 / (float)(esContext->width), 2.0 / (float)(esContext->height), 0.0);
+	mat_translate(&trl, -0.5, -0.5, 0.0);
+	mat_scale(&scl, 2.0, 2.0, 0.0);
 	mat_multiply(&image->projection, &scl, &trl);
 
 	return 0;
