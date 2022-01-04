@@ -14,7 +14,10 @@ typedef struct {
 	char* music_file;
 	char* name;
 } UserSelect;
-extern UserSelect select_options[];
+extern const UserSelect select_options[];
+extern const size_t select_count;
+extern const float speed_options[];
+extern const size_t speed_count;
 
 typedef struct {
 	Music music;
@@ -24,8 +27,8 @@ typedef struct {
 	Text textbold;
 	Image image;
 
-	float speed;
-	UserSelect* select;
+	int speed_opt;
+	int select_opt;
 } Device;
 
 enum StateRetType {

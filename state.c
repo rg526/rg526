@@ -10,13 +10,19 @@
 #include "text.h"
 #include "homemode.h"
 
-UserSelect select_options[] = {
+const UserSelect select_options[] = {
 	{
 		.note_file = "note_long.dat",
 		.music_file = "???.mp3",
 		.name = "NAME",
 	}
 };
+const size_t select_count = 1;
+
+const float speed_options[] = {
+	5.0 / 4.0
+};
+const size_t speed_count = 1;
 
 int device_init(Device* dev, ESContext *esContext) {
 	if (gpio_init(&dev->gpio) != 0) {
@@ -39,8 +45,8 @@ int device_init(Device* dev, ESContext *esContext) {
 	}
 
 	//Init speed and filename
-	dev->speed = 5.0 / 4.0;
-	dev->select = &select_options[0];
+	dev->speed_opt = 0;
+	dev->select_opt = 0;
 
 	return 0;
 }
