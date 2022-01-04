@@ -98,24 +98,24 @@ StateChg playmode_update(ESContext *esContext, State* state) {
 	for(size_t i = 0; i < data->note.length; i++)
 		if (data->note.arr[i].notetype == NOTE_SHORT){
 			float touchtime = data->note.arr[i].start;
-			if(fabs(data->timeelapsed - touchtime) < 0.1 && data->judge[i] ==0){
+			if(fabs(data->timeelapsed - touchtime) < 0.5 && data->judge[i] ==0){
 				InputLine line = input_query_clear(&data->dev->input, data->note.arr[i].pos);
 				if (!line.active) continue;
 
 				double deltatime = data->timeelapsed - ((double)(currenttime.tv_sec - line.tv.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - line.tv.tv_usec)));
-				if(fabs(deltatime - touchtime) < 0.1 ){
+				if(fabs(deltatime - touchtime) < 0.5 ){
 					data->score ++;
 					data->judge[i] = 1;
 				}
 			}
 		}
 		else{
-			if( (data->timeelapsed > data->note.arr[i].start - 0.1) && ((data->timeelapsed < data->note.arr[i].end + 0.1)) && data->judge[i] ==0){
+			if( (data->timeelapsed > data->note.arr[i].start - 0.5) && ((data->timeelapsed < data->note.arr[i].end + 0.5)) && data->judge[i] ==0){
 				InputLine line = input_query_clear(&data->dev->input, data->note.arr[i].pos);
 				if (!line.active) continue;
 
 				double deltatime = data->timeelapsed - ((double)(currenttime.tv_sec - line.tv.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - line.tv.tv_usec)));
-				if((deltatime > data->note.arr[i].start - 0.1) && ((deltatime < data->note.arr[i].end + 0.1))){
+				if((deltatime > data->note.arr[i].start - 0.5) && ((deltatime < data->note.arr[i].end + 0.5))){
 					data->score ++;
 					data->judge[i] = 1;
 				}
