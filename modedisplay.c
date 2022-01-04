@@ -61,12 +61,6 @@ int modedisplay_init(ModeDisplay* D, ESContext* esContext, Device* dev, float sp
 		return -1;
 	}
         
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glLineWidth(3.0);
-	glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
-	glEnable(GL_CULL_FACE);
-	glViewport(0, 0, esContext->width, esContext->height);
-
 	glGenBuffers(1, &D->vbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, D->vbuffer);
     return 0;

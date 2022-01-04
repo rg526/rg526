@@ -31,8 +31,8 @@ int device_init(Device* dev, ESContext *esContext) {
 
 void device_destroy(Device* dev) {
 	input_destroy(&dev->input);
-	music_destroy(&dev->music);
 	gpio_destroy(&dev->gpio);
+	music_destroy(&dev->music);
 	text_destroy(&dev->text);
 	image_destroy(&dev->image);
 }
@@ -42,6 +42,13 @@ int main () {
 	memset(&esContext, 0, sizeof(esContext));
 	esCreateWindow(&esContext, "Title", 1600, 900, ES_WINDOW_RGB);
 
+	//Specify gl options
+	glViewport(0, 0, esContext.width, esContext.height);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+	glEnable(GL_CULL_FACE);
+
+	//Config alpha blending
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
