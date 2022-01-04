@@ -117,6 +117,8 @@ int main () {
 					state->resume(&esContext, state);
 				}
 				continue;
+			} else if (change.ret == STATE_SHUTDOWN) {
+				break;
 			}
 		}
 		if (state->draw != NULL) state->draw(&esContext, state);
