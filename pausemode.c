@@ -5,6 +5,7 @@
 
 typedef struct{
     Device* dev;
+	GLuint blank;
 } PausemodeData;
 
 
@@ -17,10 +18,16 @@ int pausemode_init(ESContext* esContext, State* state, Device* dev)
     }
     PausemodeData* data = state->data;
     data->dev = dev; 
+
+	unsigned char blank_buffer[3] = {128, 128, 128};
+	data->blank = image_load(&dev->image, 1, 1, blank_buffer, 3);
+
     return 0;
 }
 
 void pausemode_destroy(ESContext* esContext, State* state){
+    PausemodeData* data = state->data;
+	image_unload(&data->dev->image, data->blank);
     free(state->data);
 }
 
@@ -55,6 +62,16 @@ StateChg pausemode_update(ESContext* esContext, State* state)
 }
 void pausemode_draw(ESContext* esContext, State* state)
 {
+    PausemodeData* data = state->data;
+
+	image_render(&data->dev->image, 0.4 * esContext->width, 0.4 * esContext->height, 0.3 * esContext->width, 0.30 * esContext->height, data->blank, NULL);
+
+	Vec color;
+	color.v[0] = 1.0;
+	color.v[1] = 0.5;
+	color.v[2] = 0.0;
+	text_draw(&data->dev->text, "Press 0 to resume" , 0.42 * esContext->width, 0.6 * esContext->height, 0.5 * esContext->width / 1600.0, &color);
+	text_draw(&data->dev->text, "Press 1 to exit" , 0.42 * esContext->width, 0.5 * esContext->height, 0.5 * esContext->width / 1600.0, &color);
 
 }
 

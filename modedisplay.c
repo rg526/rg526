@@ -35,7 +35,7 @@ const char* modedisplay_frag_shader =
 	"    vec4 h_vec = normalize(-v_pos + l_pos - v_pos);"
 	"    float spec = 0.6 * pow(max(dot(normalize(v_normal), h_vec), 0.0), 64.0);"
 	"    vec4 specular_color = spec * l_color;"
-	"    o_fragColor = v_color * (diffuse_color + ambient_color + specular_color);"
+	"    o_fragColor = vec4((v_color * (diffuse_color + ambient_color + specular_color)).rgb, 1.0);"
 	"}";
 
 int modedisplay_init(ModeDisplay* D, ESContext* esContext, Device* dev, float speed, NoteArray* note, int* judge)

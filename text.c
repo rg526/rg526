@@ -19,7 +19,7 @@ int text_init(Text* T, const char* Filename, Image* I)
 
 	for (size_t ch = 0;ch < 128;ch++) {
 		FT_Load_Char(T->face, (char)(ch), FT_LOAD_RENDER);
-		T->texture[ch] = image_load(T->image,  T->face->glyph->bitmap.width, T->face->glyph->bitmap.rows, T->face->glyph->bitmap.buffer, (void*)(1));
+		T->texture[ch] = image_load(T->image,  T->face->glyph->bitmap.width, T->face->glyph->bitmap.rows, T->face->glyph->bitmap.buffer, 1);
 		T->rows[ch] = T->face->glyph->bitmap.rows;
 		T->width[ch] = T->face->glyph->bitmap.width;
 		T->left[ch] = T->face->glyph->bitmap_left;

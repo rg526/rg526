@@ -6,7 +6,7 @@
 #define __IMAGE_H__
 
 typedef struct {
-	GLuint prog;
+	GLuint color_prog, mono_prog;
 	GLuint vbuffer;
 	Mat projection;
 } Image;
@@ -14,9 +14,9 @@ typedef struct {
 int image_init(Image*, ESContext*);
 void image_destroy(Image*);
 
-void image_draw(Image* image, float x, float y, float w, float h, float image_w, float image_h, void* image_data, Vec* color);
+void image_draw(Image* image, float x, float y, float w, float h, int image_w, int image_h, void* image_data, Vec* color);
 
-GLuint image_load(Image* image, float image_w, float image_h, void* image_data, Vec* color);
+GLuint image_load(Image* image, int image_w, int image_h, void* image_data, int channel);
 void image_render(Image* image, float x, float y, float w, float h, GLuint texture, Vec* color);
 void image_unload(Image* image, GLuint texture);
 

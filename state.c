@@ -42,6 +42,9 @@ int main () {
 	memset(&esContext, 0, sizeof(esContext));
 	esCreateWindow(&esContext, "Title", 1600, 900, ES_WINDOW_RGB);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	Device* device = malloc(sizeof(Device));
 	if (device == NULL) {
 		fprintf(stderr, "Device malloc failed\n");
