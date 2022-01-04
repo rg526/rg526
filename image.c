@@ -55,11 +55,13 @@ int image_init(Image* image, ESContext *esContext) {
 	return 0;
 }
 
+/*
 void image_draw(Image* image, float x, float y, float w, float h, int image_w, int image_h, void* image_data, Vec* color) {
 	GLuint texture = image_load(image, image_w, image_h, image_data, color != NULL ? 1 : 3);
 	image_render(image, x, y, w, h, texture, color);
 	image_unload(image, texture);
 }
+*/
 
 void image_render(Image* image, float x, float y, float w, float h, GLuint texture, Vec* color) {
 	//Use program
@@ -108,6 +110,8 @@ GLuint image_load(Image* image, int image_w, int image_h, void* image_data, int 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_w, image_h, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
 	} else if (channel == 1) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, image_w, image_h, 0, GL_RED, GL_UNSIGNED_BYTE, image_data);
+	} else if (channel == 4) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_w, image_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
 	} else {
 		glDeleteTextures(1, &texture);
 		return 0;
