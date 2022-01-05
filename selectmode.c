@@ -131,8 +131,26 @@ void selectmode_draw(ESContext* esContext, State* state)
 	color.v[0] = 0.0;
 	color.v[1] = 0.0;
 	color.v[2] = 0.0;
-	data->current == 0 ? text_draw(&data->dev->textbold, "Music" , 0.435, 0.6675, 0.8, &color) : text_draw(&data->dev->textregular, "Music" , 0.45, 0.68, 0.6, &color);
-	data->current == 1 ? text_draw(&data->dev->textbold, "Speed" , 0.4255, 0.526, 0.8, &color) : text_draw(&data->dev->textregular, "Speed" , 0.45, 0.53, 0.6, &color);
+	if(data->current == 0){
+		if(!data->expand){
+			text_draw(&data->dev->textbold, "Music" , 0.435, 0.6675, 0.8, &color); 
+		}else{
+			text_draw(&data->dev->textbold, theme_options[data->dev->theme_opt].name , 0.435, 0.6675, 0.8, &color); 
+		}
+	}else{
+		text_draw(&data->dev->textregular, "Music" , 0.45, 0.68, 0.6, &color);
+	}
+	
+	if(data->current == 1){
+		if(!data->expand){
+			text_draw(&data->dev->textbold, "Speed" , 0.4255, 0.526, 0.8, &color); 
+		}else{
+			text_draw(&data->dev->textbold, difficulty_options[data->dev->difficulty_opt].name , 0.4255, 0.526, 0.8, &color);
+		}
+	}else{
+		text_draw(&data->dev->textregular, "Speed" , 0.45, 0.53, 0.6, &color);
+	}
+
     data->current == 2 ? text_draw(&data->dev->textbold, "Start" , 0.435, 0.3711, 0.8, &color) : text_draw(&data->dev->textregular, "Start" , 0.46, 0.376, 0.6, &color);
 	data->current == 3 ? text_draw(&data->dev->textbold, "Exit" , 0.458, 0.226, 0.8, &color) : text_draw(&data->dev->textregular, "Exit" , 0.472, 0.226, 0.6, &color);;
 }

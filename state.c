@@ -14,7 +14,7 @@ const Theme theme_options[] = {
 	{
 		.note_file = "note_long.dat",
 		.music_file = "???.mp3",
-		.name = "NAME",
+		.name = "music1",
 	}
 };
 const size_t theme_count = 1;
