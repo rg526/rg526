@@ -14,19 +14,37 @@ const Theme theme_options[] = {
 	{
 		.note_file = "note_long.dat",
 		.music_file = "???.mp3",
-		.name = "NAME",
+		.name = "music1",
+	},
+	{
+		.note_file = "note_long.dat",
+		.music_file = "???.mp3",
+		.name = "music2",
+	},
+	{
+		.note_file = "note_long.dat",
+		.music_file = "???.mp3",
+		.name = "music3",
 	}
 };
-const size_t theme_count = 1;
+const size_t theme_count = 3;
 
 const Difficulty difficulty_options[] = {
 	{
 		.speed = 5.0 / 4.0,
 		.name = "Normal",
+	},
+	{
+		.speed = 5.0 / 4.0,
+		.name = "Fast",
+	},
+	{
+		.speed = 5.0 / 4.0,
+		.name = "Slow",
 	}
 };
 
-const size_t difficulty_count = 1;
+const size_t difficulty_count = 3;
 
 int device_init(Device* dev, ESContext *esContext) {
 	if (gpio_init(&dev->gpio) != 0) {
