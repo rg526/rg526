@@ -68,12 +68,13 @@ void image_render(Image* image, float x, float y, float w, float h, GLuint textu
 	GLuint prog;
 	if (color == NULL) {
 		prog = image->color_prog;
+		glUseProgram(prog);
 	} else {
 		prog = image->mono_prog;
+		glUseProgram(prog);
 		GLint f_color = glGetUniformLocation(prog, "f_color");
 		glUniform4f(f_color, color->v[0], color->v[1], color->v[2], 1.0);
 	}
-	glUseProgram(prog);
 
 	//Activate texture
 	glActiveTexture(GL_TEXTURE0);
