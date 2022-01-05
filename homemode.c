@@ -1,6 +1,7 @@
 #include "esUtil.h"
 #include "state.h"
 #include "playmode.h"
+#include "selectmode.h"
 
 typedef struct{
     Device* dev;
@@ -55,7 +56,7 @@ StateChg homemode_update(ESContext* esContext, State* state)
 		StateChg change;
 		if (data->current == 0){
 			change.ret = STATE_SWITCH_NOSAVE;
-			change.next = &playmode_state;
+			change.next = &selectmode_state;
 			return change;
 		}
 		if (data->current == 1){

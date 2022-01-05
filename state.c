@@ -10,19 +10,23 @@
 #include "text.h"
 #include "homemode.h"
 
-const UserSelect select_options[] = {
+const Theme theme_options[] = {
 	{
 		.note_file = "note_long.dat",
 		.music_file = "???.mp3",
 		.name = "NAME",
 	}
 };
-const size_t select_count = 1;
+const size_t theme_count = 1;
 
-const float speed_options[] = {
-	5.0 / 4.0
+const Difficulty difficulty_options[] = {
+	{
+		.speed = 5.0 / 4.0,
+		.name = "Normal",
+	}
 };
-const size_t speed_count = 1;
+
+const size_t difficulty_count = 1;
 
 int device_init(Device* dev, ESContext *esContext) {
 	if (gpio_init(&dev->gpio) != 0) {
@@ -45,8 +49,8 @@ int device_init(Device* dev, ESContext *esContext) {
 	}
 
 	//Init speed and filename
-	dev->speed_opt = 0;
-	dev->select_opt = 0;
+	dev->difficulty_opt = 0;
+	dev->theme_opt = 0;
 
 	return 0;
 }
