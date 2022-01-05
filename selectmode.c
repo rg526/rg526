@@ -13,6 +13,8 @@ typedef struct{
     int expand;
 	GLuint leftarrow;
 	GLuint rightarrow;
+	GLuint leftarrow_end;
+	GLuint rightarrow_end;
 	char* music;
 	char* speed;
 } SelectmodeData;
@@ -27,7 +29,7 @@ int selectmode_init(ESContext* esContext, State* state, Device* dev)
     }
     SelectmodeData* data = state->data;
     data->dev = dev; 
-	unsigned char button_buffer[3] = {68, 193, 247}; 
+	unsigned char button_buffer[3] = {74, 150, 243}; 
 	data->button = image_load(&dev->image, 1, 1, button_buffer, 3);
 	unsigned char active_button_buffer[3] = {69, 193, 247}; 
 	data->active_button = image_load(&dev->image, 1, 1, active_button_buffer, 3);
@@ -35,10 +37,16 @@ int selectmode_init(ESContext* esContext, State* state, Device* dev)
 	int left_width, left_height, right_width, right_height;
     char* left_buf = esLoadTGA(NULL, "image/left-arrow.tga", &left_width, &left_height);
 	char* right_buf = esLoadTGA(NULL, "image/right-arrow.tga", &right_width, &right_height);
+	char* left_end_buf = esLoadTGA(NULL, "image/left-arrow-disabled.tga", &left_width, &left_height);
+	char* right_end_buf = esLoadTGA(NULL, "image/right-arrow-disabled.tga", &right_width, &right_height);
 	data->leftarrow = image_load(&dev->image, left_width, left_height, left_buf, 4);
 	data->rightarrow = image_load(&dev->image, right_width, right_height, right_buf, 4);
+	data->leftarrow_end = image_load(&dev->image, left_width, left_height, left_end_buf, 4);
+	data->rightarrow_end = image_load(&dev->image, right_width, right_height, right_end_buf, 4);
 	free(left_buf);
 	free(right_buf);
+	free(left_end_buf);
+	free(right_end_buf);
 
 
 	int bg_width, bg_height;
@@ -61,6 +69,8 @@ void selectmode_destroy(ESContext* esContext, State* state){
 	image_unload(&data->dev->image, data->background);
 	image_unload(&data->dev->image, data->leftarrow);
 	image_unload(&data->dev->image, data->rightarrow);
+	image_unload(&data->dev->image, data->leftarrow_end);
+	image_unload(&data->dev->image, data->rightarrow_end);
     free(state->data);
 }
 
@@ -158,9 +168,21 @@ void selectmode_draw(ESContext* esContext, State* state)
 		if(!data->expand){
 			text_draw(&data->dev->textbold, data->music , 0.435, 0.6675, 0.8, &color); 
 		}else{
-			image_render(&data->dev->image, 0.25, 0.65, 0.05, 0.1, data->leftarrow, NULL);
-			image_render(&data->dev->image, 0.7, 0.65, 0.05, 0.1, data->rightarrow, NULL);
-			text_draw(&data->dev->textbold, theme_options[data->dev->theme_opt].name , 0.435, 0.6675, 0.8, &color); 
+			if(data->dev->theme_opt == theme_count-1){
+				image_render(&data->dev->image, 0.25, 0.65, 0.05, 0.1, data->leftarrow, NULL);
+				image_render(&data->dev->image, 0.7, 0.65, 0.05, 0.1, data->rightarrow_end, NULL);
+				text_draw(&data->dev->textbold, theme_options[data->dev->theme_opt].name , 0.435, 0.6675, 0.8, &color); 
+			}
+			else if(data->dev->theme_opt == 0){
+				image_render(&data->dev->image, 0.25, 0.65, 0.05, 0.1, data->leftarrow_end, NULL);
+				image_render(&data->dev->image, 0.7, 0.65, 0.05, 0.1, data->rightarrow, NULL);
+				text_draw(&data->dev->textbold, theme_options[data->dev->theme_opt].name , 0.435, 0.6675, 0.8, &color); 
+			}
+			else{
+			    image_render(&data->dev->image, 0.25, 0.65, 0.05, 0.1, data->leftarrow, NULL);
+				image_render(&data->dev->image, 0.7, 0.65, 0.05, 0.1, data->rightarrow, NULL);
+				text_draw(&data->dev->textbold, theme_options[data->dev->theme_opt].name , 0.435, 0.6675, 0.8, &color); 	
+			}			
 		}
 	}else{
 		text_draw(&data->dev->textregular, data->music , 0.45, 0.68, 0.6, &color);
@@ -170,9 +192,21 @@ void selectmode_draw(ESContext* esContext, State* state)
 		if(!data->expand){
 			text_draw(&data->dev->textbold, data->speed , 0.4255, 0.526, 0.8, &color); 
 		}else{
-			image_render(&data->dev->image, 0.25, 0.5, 0.05, 0.1, data->leftarrow, NULL);
-		    image_render(&data->dev->image, 0.7, 0.5, 0.05, 0.1, data->rightarrow, NULL);
-			text_draw(&data->dev->textbold, difficulty_options[data->dev->difficulty_opt].name , 0.4255, 0.522, 0.8, &color);
+			if(data->dev->difficulty_opt == difficulty_count-1){
+				image_render(&data->dev->image, 0.25, 0.5, 0.05, 0.1, data->leftarrow, NULL);
+		    	image_render(&data->dev->image, 0.7, 0.5, 0.05, 0.1, data->rightarrow_end, NULL);
+				text_draw(&data->dev->textbold, difficulty_options[data->dev->difficulty_opt].name , 0.4255, 0.522, 0.8, &color);
+			}
+			else if(data->dev->difficulty_opt == 0){
+				image_render(&data->dev->image, 0.25, 0.5, 0.05, 0.1, data->leftarrow_end, NULL);
+		    	image_render(&data->dev->image, 0.7, 0.5, 0.05, 0.1, data->rightarrow, NULL);
+				text_draw(&data->dev->textbold, difficulty_options[data->dev->difficulty_opt].name , 0.4255, 0.522, 0.8, &color);
+			}
+			else{
+				image_render(&data->dev->image, 0.25, 0.5, 0.05, 0.1, data->leftarrow, NULL);
+		    	image_render(&data->dev->image, 0.7, 0.5, 0.05, 0.1, data->rightarrow, NULL);
+				text_draw(&data->dev->textbold, difficulty_options[data->dev->difficulty_opt].name , 0.4255, 0.522, 0.8, &color);
+			}
 		}
 	}else{
 		text_draw(&data->dev->textregular, data->speed , 0.45, 0.53, 0.6, &color);

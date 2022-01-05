@@ -21,14 +21,14 @@ int pausemode_init(ESContext* esContext, State* state, Device* dev)
     PausemodeData* data = state->data;
     data->dev = dev; 
 
-	unsigned char blank_buffer[3] = {69, 193, 247};
+	unsigned char blank_buffer[3] = {76, 131, 34};
 	unsigned char button_buffer[3] = {74,150, 243};
-	unsigned char active_button_buffer[3] = {74, 150, 243};
+	unsigned char active_button_buffer[3] = {49, 193, 247};
 	data->blank = image_load(&dev->image, 1, 1, blank_buffer, 3);
 	data->button = image_load(&dev->image, 1, 1, button_buffer, 3);
 	data->active_button = image_load(&dev->image, 1, 1, active_button_buffer, 3);
 
-	data->count = 2;
+	data->count = 3;
 	data->current = 0;
 
     return 0;
@@ -57,7 +57,11 @@ StateChg pausemode_update(ESContext* esContext, State* state)
 			change.next = &playmode_state;
 			return change;
 		case 1:
-			change.ret = STATE_SWITCH_NOSAVE;
+			change.ret = STATE_SWITCH_DISCARD;
+			change.next = &playmode_state;
+			return change;
+		case 2:
+		    change.ret = STATE_SWITCH_NOSAVE;
 			change.next = &homemode_state;
 			return change;
 		}
@@ -91,17 +95,19 @@ void pausemode_draw(ESContext* esContext, State* state)
 {
     PausemodeData* data = state->data;
     
-	image_render(&data->dev->image, 0.3, 0.3, 0.4, 0.4, data->blank, NULL);
+	image_render(&data->dev->image, 0.3, 0.24, 0.4, 0.6, data->blank, NULL);
 
-	image_render(&data->dev->image, 0.35, 0.55, 0.3, 0.1, data->current == 0 ? data->active_button : data->button, NULL);
-	image_render(&data->dev->image, 0.35, 0.35, 0.3, 0.1, data->current == 1 ? data->active_button : data->button, NULL);
+	image_render(&data->dev->image, 0.35, 0.635, 0.3, 0.1, data->current == 0 ? data->active_button : data->button, NULL);
+	image_render(&data->dev->image, 0.35, 0.485, 0.3, 0.1, data->current == 1 ? data->active_button : data->button, NULL);
+	image_render(&data->dev->image, 0.35, 0.335, 0.3, 0.1, data->current == 2 ? data->active_button : data->button, NULL);
 
 	Vec color;
 	color.v[0] = 0.0;
 	color.v[1] = 0.0;
 	color.v[2] = 0.0;
-	text_draw(data->current == 0 ? &data->dev->textbold : &data->dev->textregular, "Resume" , 0.4285, 0.58, 0.6, &color);
-	text_draw(data->current == 1 ? &data->dev->textbold : &data->dev->textregular, "Exit" , 0.4715, 0.376, 0.6, &color);
+	text_draw(data->current == 0 ? &data->dev->textbold : &data->dev->textregular, "Resume" , 0.4285, 0.66, 0.6, &color);
+	text_draw(data->current == 1 ? &data->dev->textbold : &data->dev->textregular, "Restart" , 0.4385, 0.512, 0.6, &color);
+	text_draw(data->current == 2 ? &data->dev->textbold : &data->dev->textregular, "Exit" , 0.4685, 0.356, 0.6, &color);
 }
 
 State pausemode_state = {

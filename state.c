@@ -141,6 +141,15 @@ int main () {
 				continue;
 			} else if (change.ret == STATE_SHUTDOWN) {
 				break;
+			} else if (change.ret == STATE_SWITCH_DISCARD) {
+				state->destroy(&esContext, state);
+				saved->destroy(&esContext, saved);
+				state = change.next;
+				if (state->init(&esContext, state, device) != 0) {
+					fprintf(stderr, "state init failed\n");
+					return 1;
+				}
+				continue;
 			}
 		}
 		if (state->draw != NULL) state->draw(&esContext, state);

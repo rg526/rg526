@@ -43,6 +43,7 @@ enum StateRetType {
 	STATE_SWITCH_SAVE,
 	STATE_SWITCH_RESTORE,
 	STATE_SHUTDOWN,
+	STATE_SWITCH_DISCARD,
 };
 
 typedef struct {
