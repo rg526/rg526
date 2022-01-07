@@ -20,13 +20,16 @@ int endmode_init(ESContext* esContext, State* state, Device* dev)
     }
     EndmodeData* data = state->data;
     data->dev = dev; 
-
+    
+    int button_width, button_height, active_button_width, active_button_height;
+	char* active_button_buf = esLoadTGA(NULL, "image/active-button.tga", &active_button_width, &active_button_height);
+    char* button_buf = esLoadTGA(NULL, "image/button.tga", &button_width, &button_height);
+	data->button = image_load(&dev->image, button_width, button_height, button_buf, 4);
+    data->active_button = image_load(&dev->image, active_button_width, active_button_height, active_button_buf, 4);
+	free(button_buf);
+    free(active_button_buf);
 	unsigned char blank_buffer[3] = {76, 131, 34};
-	unsigned char button_buffer[3] = {74,150, 243};
-	unsigned char active_button_buffer[3] = {49, 193, 247};
 	data->blank = image_load(&dev->image, 1, 1, blank_buffer, 3);
-	data->button = image_load(&dev->image, 1, 1, button_buffer, 3);
-	data->active_button = image_load(&dev->image, 1, 1, active_button_buffer, 3);
 
 	data->count = 2;
 	data->current = 0;

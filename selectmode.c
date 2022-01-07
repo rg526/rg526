@@ -29,10 +29,14 @@ int selectmode_init(ESContext* esContext, State* state, Device* dev)
     }
     SelectmodeData* data = state->data;
     data->dev = dev; 
-	unsigned char button_buffer[3] = {74, 150, 243}; 
-	data->button = image_load(&dev->image, 1, 1, button_buffer, 3);
-	unsigned char active_button_buffer[3] = {69, 193, 247}; 
-	data->active_button = image_load(&dev->image, 1, 1, active_button_buffer, 3);
+
+	int button_width, button_height, active_button_width, active_button_height;
+	char* active_button_buf = esLoadTGA(NULL, "image/active-button.tga", &active_button_width, &active_button_height);
+    char* button_buf = esLoadTGA(NULL, "image/button.tga", &button_width, &button_height);
+	data->button = image_load(&dev->image, button_width, button_height, button_buf, 4);
+    data->active_button = image_load(&dev->image, active_button_width, active_button_height, active_button_buf, 4);
+	free(button_buf);
+    free(active_button_buf);
 
 	int left_width, left_height, right_width, right_height;
     char* left_buf = esLoadTGA(NULL, "image/left-arrow.tga", &left_width, &left_height);
