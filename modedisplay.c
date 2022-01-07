@@ -176,14 +176,14 @@ void modedisplay_draw(ModeDisplay* D, double time)
 			if(start_pos < 0) start_pos = 0;
 			if(end_pos > 5) end_pos = 5;
 
-			if (!D->judge[i]) {
+			if (D->judge[i] <= 0) {//inactive
 				Mat scaleup, translate;
 				mat_scale(&scaleup, 1.0, (end_pos - start_pos)/0.3, 1.0);
 				mat_translate(&translate, (float)(D->note->arr[i].pos)*(0.5) - 1.25, (end_pos + start_pos)/2 , 0.0);
 
 				mat_multiply(&front_mat, &translate, &scaleup);
 				draw_obj(&D->block, &mv_mat, &p_mat, &front_mat, NULL, D->prog);
-			} else {
+			} else { //active
 				Vec active_color;
 				active_color.v[0] = 0.953;
 				active_color.v[1] = 0.588;
