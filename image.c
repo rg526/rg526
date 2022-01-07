@@ -85,6 +85,7 @@ void image_render(Image* image, float x, float y, float w, float h, GLuint textu
 		x, y + h, x, y, x + w, y, x, y + h, x + w, y, x + w, y + h,
 		0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0
 	};
+	glBindBuffer(GL_ARRAY_BUFFER, image->vbuffer);
 	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(GLfloat), rect_vertices, GL_DYNAMIC_DRAW);
 
 	//Pass attributes and uniforms

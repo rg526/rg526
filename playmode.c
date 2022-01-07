@@ -11,6 +11,7 @@
 #include "modedisplay.h"
 #include <sys/time.h>
 #include "pausemode.h"
+#include "endmode.h"
 
 typedef struct {
 	Device* dev;
@@ -21,6 +22,7 @@ typedef struct {
 	int score;
 	int* judge;
 	ModeDisplay modedisplay;
+	GLuint background;
 } PlaymodeData;
 
 int playmode_init(ESContext *esContext, State* state, Device* dev) {
@@ -60,6 +62,12 @@ int playmode_init(ESContext *esContext, State* state, Device* dev) {
 		free(data);
 		return -1;
 	}
+
+	int bg_width, bg_height;
+	char* bg_buf = esLoadTGA(NULL, "bg.tga", &bg_width, &bg_height);
+	data->background = image_load(&dev->image, bg_width, bg_height, bg_buf, 3);
+	free(bg_buf);
+
 	return 0;
 }
 
@@ -93,7 +101,14 @@ StateChg playmode_update(ESContext *esContext, State* state) {
 	//Update time elapsed
 	data->timeelapsed += ((double)(currenttime.tv_sec - data->abstime.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - data->abstime.tv_usec)));
 	data->abstime = currenttime;
-
+    
+	//judge end time
+    if (data->timeelapsed >= data->note.endtime){
+		StateChg change;
+		change.ret = STATE_SWITCH_NOSAVE;
+		change.next = &endmode_state;
+		return change;	
+	}
 	//Judge notes
 	for(size_t i = 0; i < data->note.length; i++)
 		if (data->note.arr[i].notetype == NOTE_SHORT){
@@ -134,7 +149,8 @@ void playmode_draw(ESContext *esContext, State* state) {
 
 	//Clear screen
 	glClear(GL_COLOR_BUFFER_BIT);
-
+    
+	image_render(&data->dev->image, 0.0, 0.0, 1.0, 1.0, data->background, NULL);
 	//Draw disp
     modedisplay_draw(&data->modedisplay, data->timeelapsed);
 
@@ -155,7 +171,7 @@ void playmode_destroy(ESContext *esContext, State* state) {
     modedisplay_destroy(&data->modedisplay);
 	free(data->judge);
 	note_destroy(&data->note);
-	
+	image_unload(&data->dev->image, data->background);
 	//Free data struct
 	free(data);
 }

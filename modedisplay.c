@@ -149,6 +149,7 @@ void modedisplay_draw(ModeDisplay* D, double time)
 
 	//Use program
 	glUseProgram(D->prog);
+	glBindBuffer(GL_ARRAY_BUFFER, D->vbuffer);
 
 	//Draw judge line
 	Vec line_color;

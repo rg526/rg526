@@ -13,6 +13,7 @@ typedef struct{
 
 typedef struct {
     size_t length;
+    float endtime;
     NoteBlock *arr;
 } NoteArray;
 
