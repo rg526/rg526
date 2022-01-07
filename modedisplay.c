@@ -178,7 +178,7 @@ void modedisplay_draw(ModeDisplay* D, double time)
 
 			if (!D->judge[i]) {
 				Mat scaleup, translate;
-				mat_scale(&scaleup, 1.0, (end_pos - start_pos)/0.1, 1.0);
+				mat_scale(&scaleup, 1.0, (end_pos - start_pos)/0.3, 1.0);
 				mat_translate(&translate, (float)(D->note->arr[i].pos)*(0.5) - 1.25, (end_pos + start_pos)/2 , 0.0);
 
 				mat_multiply(&front_mat, &translate, &scaleup);
@@ -190,7 +190,7 @@ void modedisplay_draw(ModeDisplay* D, double time)
 				active_color.v[2] = 0.290;
 
 				Mat scaleup, translate;
-				mat_scale(&scaleup, 1.0, (end_pos - start_pos)/0.1, 2.0);
+				mat_scale(&scaleup, 1.0, (end_pos - start_pos)/0.3, 2.0);
 				mat_translate(&translate, (float)(D->note->arr[i].pos)*(0.5) - 1.25, (end_pos + start_pos)/2 , 0.0);
 
 				mat_multiply(&front_mat, &translate, &scaleup);
