@@ -5,7 +5,6 @@
 
 typedef struct{
     Device* dev;
-	GLuint blank;
 	GLuint button, active_button;
 	size_t count, current;
 } PausemodeData;
@@ -21,10 +20,6 @@ int pausemode_init(ESContext* esContext, State* state, Device* dev)
     PausemodeData* data = state->data;
     data->dev = dev; 
 
-	unsigned char blank_buffer[3] = {76, 131, 34};
-	data->blank = image_load(&dev->image, 1, 1, blank_buffer, 3);
-
-
 	int button_width, button_height, active_button_width, active_button_height;
 	char* active_button_buf = esLoadTGA(NULL, "image/active-button.tga", &active_button_width, &active_button_height);
     char* button_buf = esLoadTGA(NULL, "image/button.tga", &button_width, &button_height);
@@ -33,7 +28,6 @@ int pausemode_init(ESContext* esContext, State* state, Device* dev)
 	free(button_buf);
     free(active_button_buf);
 	
-
 	data->count = 3;
 	data->current = 0;
 
@@ -42,7 +36,6 @@ int pausemode_init(ESContext* esContext, State* state, Device* dev)
 
 void pausemode_destroy(ESContext* esContext, State* state){
     PausemodeData* data = state->data;
-	image_unload(&data->dev->image, data->blank);
 	image_unload(&data->dev->image, data->button);
 	image_unload(&data->dev->image, data->active_button);
     free(state->data);
@@ -101,8 +94,6 @@ void pausemode_draw(ESContext* esContext, State* state)
 {
     PausemodeData* data = state->data;
     
-	image_render(&data->dev->image, 0.3, 0.24, 0.4, 0.6, data->blank, NULL);
-
 	image_render(&data->dev->image, 0.35, 0.635, 0.3, 0.1, data->current == 0 ? data->active_button : data->button, NULL);
 	image_render(&data->dev->image, 0.35, 0.485, 0.3, 0.1, data->current == 1 ? data->active_button : data->button, NULL);
 	image_render(&data->dev->image, 0.35, 0.335, 0.3, 0.1, data->current == 2 ? data->active_button : data->button, NULL);
