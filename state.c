@@ -13,7 +13,7 @@
 const Theme theme_options[] = {
 	{
 		.note_file = "note_long.dat",
-		.music_file = ".music/music1.mp3",
+		.music_file = "music/music1.mp3",
 		.name = "music1",
 	},
 	{
