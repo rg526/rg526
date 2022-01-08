@@ -23,6 +23,8 @@ typedef struct {
 	int* judge;
 	ModeDisplay modedisplay;
 	GLuint background;
+	GLuint progress_bg;
+	GLuint progress_bar;
 } PlaymodeData;
 
 int playmode_init(ESContext *esContext, State* state, Device* dev) {
@@ -67,6 +69,11 @@ int playmode_init(ESContext *esContext, State* state, Device* dev) {
 	char* bg_buf = esLoadTGA(NULL, "bg.tga", &bg_width, &bg_height);
 	data->background = image_load(&dev->image, bg_width, bg_height, bg_buf, 3);
 	free(bg_buf);
+    
+	unsigned char prbg_buf[3] = {255, 255, 255};  
+	data->progress_bg = image_load(&dev->image, 1, 1, prbg_buf, 3);
+	unsigned char prbr_buf[3] = {74, 150, 243};  
+	data->progress_bar = image_load(&dev->image, 1, 1, prbr_buf, 3);
 
 	return 0;
 }
@@ -166,7 +173,11 @@ void playmode_draw(ESContext *esContext, State* state) {
 	//Clear screen
 	glClear(GL_COLOR_BUFFER_BIT);
     
+	//draw background and progress bar
 	image_render(&data->dev->image, 0.0, 0.0, 1.0, 1.0, data->background, NULL);
+	image_render(&data->dev->image, 0.1, 0.95, 0.8, 0.025, data->progress_bg, NULL);
+	image_render(&data->dev->image, 0.1, 0.95, (data->timeelapsed / data->note.endtime) * 0.8, 0.025, data->progress_bar, NULL);
+
 	//Draw disp
     modedisplay_draw(&data->modedisplay, data->timeelapsed);
 
@@ -188,6 +199,8 @@ void playmode_destroy(ESContext *esContext, State* state) {
 	free(data->judge);
 	note_destroy(&data->note);
 	image_unload(&data->dev->image, data->background);
+	image_unload(&data->dev->image, data->progress_bg);
+	image_unload(&data->dev->image, data->progress_bar);
 	//Free data struct
 	free(data);
 }
