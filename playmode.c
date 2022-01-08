@@ -111,6 +111,7 @@ StateChg playmode_update(ESContext *esContext, State* state) {
     
 	//judge end time
     if (data->timeelapsed >= data->note.endtime){
+		input_clearall(&data->dev->input);
 		StateChg change;
 		change.ret = STATE_SWITCH_NOSAVE;
 		change.next = &endmode_state;

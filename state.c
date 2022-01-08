@@ -31,11 +31,11 @@ const size_t theme_count = 3;
 
 const Difficulty difficulty_options[] = {
 	{
-		.speed = 5.0 / 4.0,
+		.speed = 5.0 / 3.0,
 		.name = "Normal",
 	},
 	{
-		.speed = 5.0 / 4.0,
+		.speed = 5.0 / 2.0,
 		.name = "Fast",
 	},
 	{

@@ -94,10 +94,11 @@ void endmode_draw(ESContext* esContext, State* state)
 	image_render(&data->dev->image, 0.35, 0.335, 0.3, 0.1, data->current == 1 ? data->active_button : data->button, NULL);
 
 	Vec color;
-	color.v[0] = 1;
-	color.v[1] = 0.305;
-	color.v[2] = 0;
-	text_draw(data->current == 0 ? &data->dev->textbold : &data->dev->textregular, "Game Over" , 0.2735, 0.66, 1.35, &color);
+	color.v[0] = 243.0/255.0;
+	color.v[1] = 150.0/255.0;
+	color.v[2] = 74.0/255.0;
+	
+	text_draw(&data->dev->textregular, "Game Over" , 0.2385, 0.66, 1.55, &color);
 
 	color.v[0] = 0.0;
 	color.v[1] = 0.0;
