@@ -216,7 +216,7 @@ void selectmode_draw(ESContext* esContext, State* state)
 		text_draw(&data->dev->textregular, data->speed , 0.45, 0.53, 0.6, &color);
 	}
 
-    data->current == 2 ? text_draw(&data->dev->textbold, "Start" , 0.435, 0.3711, 0.8, &color) : text_draw(&data->dev->textregular, "Start" , 0.46, 0.376, 0.6, &color);
+    data->current == 2 ? text_draw(&data->dev->textbold, "Play" , 0.435, 0.3711, 0.8, &color) : text_draw(&data->dev->textregular, "Play" , 0.46, 0.376, 0.6, &color);
 	data->current == 3 ? text_draw(&data->dev->textbold, "Exit" , 0.458, 0.226, 0.8, &color) : text_draw(&data->dev->textregular, "Exit" , 0.472, 0.226, 0.6, &color);;
 }
 

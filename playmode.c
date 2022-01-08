@@ -75,6 +75,8 @@ int playmode_init(ESContext *esContext, State* state, Device* dev) {
 	unsigned char prbr_buf[3] = {74, 150, 243};  
 	data->progress_bar = image_load(&dev->image, 1, 1, prbr_buf, 3);
 
+	music_play(&dev->music, theme_options[dev->theme_opt].music_file);
+
 	return 0;
 }
 
@@ -84,7 +86,7 @@ void playmode_resume(ESContext *esContext, State* state) {
 	//Reset time
 	gettimeofday(&data->abstime, NULL);
 
-	//TODO: resume music playback on resume
+	music_pause(&data->dev->music);
 }
 
 StateChg playmode_update(ESContext *esContext, State* state) {
@@ -94,6 +96,8 @@ StateChg playmode_update(ESContext *esContext, State* state) {
 	InputLine pause_line = input_query_clear(&data->dev->input, 0);
 	if (pause_line.active) {
 		input_clearall(&data->dev->input);
+
+		music_pause(&data->dev->music);
 
 		StateChg change;
 		change.ret = STATE_SWITCH_SAVE;
