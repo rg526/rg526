@@ -12,17 +12,17 @@
 
 const Theme theme_options[] = {
 	{
-		.note_file = "note_long.dat",
+		.note_file = "note/note1.dat",
 		.music_file = "music/music1.mp3",
 		.name = "music1",
 	},
 	{
-		.note_file = "note_long.dat",
+		.note_file = "note/note2.dat",
 		.music_file = "music/music2.mp3",
 		.name = "music2",
 	},
 	{
-		.note_file = "note_long.dat",
+		.note_file = "note/note3.dat",
 		.music_file = "music/music3.mp3",
 		.name = "music3",
 	}
