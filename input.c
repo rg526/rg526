@@ -34,12 +34,17 @@ void* __input_scan_gpio(void* ptr) {
 
 				//Activate line
 				pthread_mutex_lock(&input->lock[line]);
-				input->v[line].active = 1;
-				input->v[line].tv = current_time;
+
+				double delta_time = (double)(current_time.tv_sec - input->v[line].tv.tv_sec) + 1e-6 * (double)(current_time.tv_usec - input->v[line].tv.tv_usec);
+				if (input->v[line].active || delta_time > 0.2) {
+					input->v[line].active = 1;
+					input->v[line].tv = current_time;
+				}
+
 				pthread_mutex_unlock(&input->lock[line]);
 			}
 		}
-		usleep(2000);
+		usleep(1000);
 	}
 }
 
@@ -56,7 +61,6 @@ InputLine input_query_clear(Input* input, size_t line) {
 	pthread_mutex_lock(&input->lock[line]);
 	ret = input->v[line];
 	input->v[line].active = 0;
-	memset(&input->v[line].tv, 0, sizeof(input->v[line].tv));
 	pthread_mutex_unlock(&input->lock[line]);
 	return ret;
 }
@@ -65,7 +69,6 @@ void input_clearall(Input* input) {
 	for (size_t i = 0;i < INPUT_COUNT;i++) {
 		pthread_mutex_lock(&input->lock[i]);
 		input->v[i].active = 0;
-		memset(&input->v[i].tv, 0, sizeof(input->v[i].tv));
 		pthread_mutex_unlock(&input->lock[i]);
 	}
 }
@@ -79,7 +82,7 @@ int input_init(Input* input, ESContext* esContext, GPIO* gpio) {
 			return 1;
 		}
 		input->v[i].active = 0;
-		memset(&input->v[i].tv, 0, sizeof(input->v[i].tv));
+		gettimeofday(&input->v[i].tv, NULL);
 	}
 
 	//Keyboard callback registration
