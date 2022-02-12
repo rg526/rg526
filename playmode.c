@@ -122,22 +122,24 @@ StateChg playmode_update(ESContext *esContext, State* state) {
 		return change;	
 	}
 	//Judge notes
-	for(size_t i = 0; i < data->note.length; i++)
+	for(size_t i = 0; i < data->note.length; i++) {
+		size_t pos = data->note.arr[i].pos;
 		if (data->note.arr[i].notetype == NOTE_SHORT){
 			if(fabs(data->timeelapsed - data->note.arr[i].start) < 0.5 && data->judge[i] ==0){
-				InputLine line = input_query_clear(&data->dev->input, data->note.arr[i].pos);
+				InputLine line = input_query_clear(&data->dev->input, pos);
 				if (!line.active) continue;
 
 				double deltatime = data->timeelapsed - ((double)(currenttime.tv_sec - line.tv.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - line.tv.tv_usec)));
 				if(fabs(deltatime - data->note.arr[i].start) < 0.5 ){
 					data->score ++;
 					data->judge[i] = 1;
+					gpio_output_delay(&data->dev->gpio, pos - 1, 0.15);
 				}
 			}
 		}
 		else{
 			if( (data->timeelapsed > data->note.arr[i].start - 0.5) && ((data->timeelapsed < data->note.arr[i].end + 0.5)) && data->judge[i] != -1){
-				InputLine line = input_query(&data->dev->input, data->note.arr[i].pos);
+				InputLine line = input_query(&data->dev->input, pos);
 				if (!line.active) continue;
 
 				double deltatime = data->timeelapsed - ((double)(currenttime.tv_sec - line.tv.tv_sec) + 1e-6 * ((double)(currenttime.tv_usec - line.tv.tv_usec)));
@@ -145,6 +147,7 @@ StateChg playmode_update(ESContext *esContext, State* state) {
 					if(fabs(deltatime - data->note.arr[i].start) < 0.5){
 						data->score ++;
 						data->judge[i] = 1;
+						gpio_output_delay(&data->dev->gpio, pos - 1, 0.15);
 					}
 				}
 				else if(data->judge[i] > 0){
@@ -153,17 +156,20 @@ StateChg playmode_update(ESContext *esContext, State* state) {
 					}
 					else{
 						if((deltatime - data->note.arr[i].start) / (data->note.arr[i].end - data->note.arr[i].start) > 0.5 && data->judge[i] == 1){
-							data->judge[i] = 2;
 							data->score ++;
+							data->judge[i] = 2;
+							gpio_output_delay(&data->dev->gpio, pos - 1, 0.15);
 						}
 						else if((deltatime - data->note.arr[i].start) /  (data->note.arr[i].end - data->note.arr[i].start) > 0.85 && data->judge[i] == 2){
-							data->judge[i] = 3;
 							data->score ++;
+							data->judge[i] = 3;
+							gpio_output_delay(&data->dev->gpio, pos - 1, 0.15);
 						}
 					}
 				}
 			}
 		}
+	}
 		
 	//Continue playmode
 	StateChg change;

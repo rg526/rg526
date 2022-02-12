@@ -1,6 +1,10 @@
 INCDIR=-I/usr/include/freetype2 -Ies
-CFLAGS=-Wall -Wextra -Wno-unused-parameter
+CFLAGS=-Wall -Wextra -Wno-unused-parameter -O2
 LIBS=-lGLESv2 -lEGL -lX11 -lm -pthread -lgpiod -lfreetype
+
+ifdef RASPI
+	CFLAGS += -DRASPI
+endif
 
 all: rg526
 

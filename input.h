@@ -17,8 +17,8 @@ typedef struct {
 typedef struct {
 	ESContext* esContext;
 	GPIO* gpio;
-	InputLine v[5];
-	pthread_mutex_t lock[5];
+	InputLine v[INPUT_COUNT];
+	pthread_mutex_t lock[INPUT_COUNT];
 	pthread_t gpio_scan_thread;
 } Input;
 

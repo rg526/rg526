@@ -12,17 +12,17 @@
 
 const Theme theme_options[] = {
 	{
-		.note_file = "note_long.dat",
-		.music_file = ".music/music1.mp3",
+		.note_file = "note/note_1.dat",
+		.music_file = "music/music1.mp3",
 		.name = "music1",
 	},
 	{
-		.note_file = "note_long.dat",
+		.note_file = "note/note_2.dat",
 		.music_file = "music/music2.mp3",
 		.name = "music2",
 	},
 	{
-		.note_file = "note_long.dat",
+		.note_file = "note/note_3.dat",
 		.music_file = "music/music3.mp3",
 		.name = "music3",
 	}
@@ -85,7 +85,7 @@ void device_destroy(Device* dev) {
 int main () {
 	ESContext esContext;
 	memset(&esContext, 0, sizeof(esContext));
-	esCreateWindow(&esContext, "Title", 1600, 900, ES_WINDOW_RGB);
+	esCreateWindow(&esContext, "Title", 1024, 576, ES_WINDOW_RGB);
 
 	//Specify gl options
 	glViewport(0, 0, esContext.width, esContext.height);
