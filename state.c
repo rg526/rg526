@@ -85,7 +85,7 @@ void device_destroy(Device* dev) {
 int main () {
 	ESContext esContext;
 	memset(&esContext, 0, sizeof(esContext));
-	esCreateWindow(&esContext, "Title", 1024, 576, ES_WINDOW_RGB);
+	esCreateWindow(&esContext, "Haptic Rhythm Music Game", 960, 540, ES_WINDOW_RGB);
 
 	//Specify gl options
 	glViewport(0, 0, esContext.width, esContext.height);
